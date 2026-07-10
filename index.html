@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#050505">
+    <meta name="description" content="Lenormand AI - Leitura de Cartas">
+    <title>LENORMAND AI</title>
+    
+    <!-- Ícone Base64 para evitar problemas de encode -->
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzA1MDUwNSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkyDwn5OoPC90ZXh0Pjwvc3ZnPg==">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzA1MDUwNSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkyDwn5OoPC90ZXh0Pjwvc3ZnPg==">
+
+    <style>
+        :root { --gold: #d4af37; --bg: #050505; --card-bg: #111; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: #eee; 
+            margin: 0; 
+            padding: env(safe-area-inset-top) 15px 15px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            overscroll-behavior: none;
+        }
+
+        h1 { color: var(--gold); margin: 10px 0 5px 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; text-align: center; font-weight: 300; }
+        .sub { color: #666; font-size: 0.75rem; margin-bottom: 20px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .controls { width: 100%; max-width: 500px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 12px; }
+        
+        .gender-select {
+            display: flex;
+            background: #111;
+            border-radius: 8px;
+            padding: 2px;
+            border: 1px solid #333;
+            justify-content: space-between;
+        }
+        .gender-opt {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .gender-opt.active {
+            background: #333;
+            color: var(--gold);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .qty-select {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: #111;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--gold);
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        .qty-select.visible { display: flex; }
+        .qty-btn {
+            flex: 1;
+            background: #222;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .qty-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); }
+        .qty-btn:active { transform: scale(0.95); }
+
+        textarea { 
+            width: 100%; 
+            height: 70px; 
+            background: #111; 
+            border: 1px solid #333; 
+            color: var(--gold); 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-family: inherit; 
+            resize: none; 
+            font-size: 15px;
+            outline: none;
+        }
+        textarea:focus { border-color: var(--gold); }
+        
+        .action-group { display: flex; gap: 10px; }
+        button.action-btn { 
+            background: #111; 
+            border: 1px solid var(--gold); 
+            color: var(--gold); 
+            padding: 14px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            border-radius: 8px; 
+            transition: 0.2s; 
+            flex: 1; 
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        button.action-btn:active { transform: scale(0.96); background: #222; }
+        button.action-btn:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        button.action-btn:disabled { border-color: #333; color: #444; cursor: not-allowed; opacity: 0.6; }
+        
+        button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 70px; }
+        button.btn-clear:hover { background: #551111; color: #fff; box-shadow: none; }
+
+        .grid-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            margin: 10px auto;
+            perspective: 1000px;
+            min-height: 200px;
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            width: 100%; 
+            max-width: 340px; 
+        }
+
+        .grid.mesa-real {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 100%;
+            gap: 4px;
+        }
+        
+        .card { 
+            width: 100%; 
+            aspect-ratio: 2.5/3.5; 
+            background: var(--card-bg); 
+            border: 1px solid #333; 
+            border-radius: 6px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            user-select: none; 
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        
+        .mesa-real .card {
+            aspect-ratio: 3/4;
+            border-width: 1px;
+            border-radius: 4px;
+        }
+        .mesa-real .card-inner { font-size: 1.5rem; }
+        .mesa-real .card-name { font-size: 0.4rem; margin-top: 2px; }
+
+        .card.flipped { 
+            border-color: var(--gold); 
+            background: #1a1a1a;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+        }
+        
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden; 
+        }
+
+        .card-inner { font-size: 2.2rem; pointer-events: none; line-height: 1; }
+        .card-name { 
+            font-size: 0.7rem; 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            text-align: center; 
+            line-height: 1.1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .card.flipped .card-name { opacity: 1; }
+
+        .deck-stack {
+            width: 110px;
+            height: 150px;
+            background: #111;
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .deck-stack:active { transform: scale(0.95); }
+        .deck-stack::before, .deck-stack::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px;
+            width: 100%; height: 100%;
+            border: 2px solid #444;
+            border-radius: 10px;
+            z-index: -1;
+        }
+        .deck-stack::after {
+            top: -6px; left: -6px;
+            border-color: #222;
+            z-index: -2;
+        }
+        .deck-label {
+            color: var(--gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .report { 
+            max-width: 600px; 
+            width: 100%; 
+            background: #0f0f0f; 
+            border-left: 4px solid var(--gold); 
+            padding: 20px; 
+            margin-top: 20px; 
+            line-height: 1.7; 
+            white-space: pre-wrap; 
+            display: none; 
+            font-size: 1rem;
+            color: #ddd;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .loading { 
+            color: var(--gold); 
+            display: none; 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 0.9rem; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .loading span { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        #install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div style="text-align: center; width: 100%;">
+        <h1>Lenormand AI</h1>
+        <div class="sub">Oráculo Digital</div>
+    </div>
+
+    <div class="controls">
+        <div style="color: #888; font-size: 0.8rem; margin-bottom: 2px; text-align: left; padding-left: 5px;">CONSULENTE:</div>
+        <div class="gender-select">
+            <button class="gender-opt active" onclick="setGender('Homem')">Homem</button>
+            <button class="gender-opt" onclick="setGender('Mulher')">Mulher</button>
+            <button class="gender-opt" onclick="setGender('Outro')">Outro</button>
+        </div>
+
+        <div id="qty-selector" class="qty-select">
+            <button class="qty-btn" onclick="confirmQty(1)">1 Carta</button>
+            <button class="qty-btn" onclick="confirmQty(3)">3 Cartas</button>
+            <button class="qty-btn" onclick="confirmQty(9)">9 Cartas</button>
+            <button class="qty-btn" onclick="confirmQty(36)">Mesa Real</button>
+        </div>
+
+        <textarea id="question" placeholder="Digite sua pergunta ou deixe em branco..."></textarea>
+        
+        <div class="action-group">
+            <button class="action-btn" id="btn-deal" onclick="initDeal()">🎲 Abrir</button>
+            <button class="action-btn" id="btn-read" onclick="read()" disabled>✨ Interpretar</button>
+            <button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
+        </div>
+    </div>
+
+    <div id="deck-view" class="deck-stack" style="display:none;" onclick="showQtySelector()">
+        <div class="deck-label">Toque para<br>escolher</div>
+    </div>
+
+    <div class="grid-container">
+        <div class="grid" id="table"></div>
+    </div>
+
+    <div id="loading" class="loading">Conectando ao Oráculo<span>...</span></div>
+    <div id="report" class="report"></div>
+
+    <div id="install-prompt" onclick="installApp()">📲 Instalar App</div>
+
+    <script>
+        // CONFIG
+        const KEY = "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"; 
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        const MODEL = "llama-3.1-8b-instant";
+
+        const deck = [
+            {n:1, name:"Cavaleiro", i:"🏇"}, {n:2, name:"Trevo", i:"☘️"}, {n:3, name:"Navio", i:"⛵"}, {n:4, name:"Casa", i:"🏠"},
+            {n:5, name:"Árvore", i:"🌳"}, {n:6, name:"Nuvens", i:"☁️"}, {n:7, name:"Cobra", i:"🐍"}, {n:8, name:"Caixão", i:"⚰️"},
+            {n:9, name:"Buquê", i:"💐"}, {n:10, name:"Foice", i:"🌾"}, {n:11, name:"Chicote", i:"🎢"}, {n:12, name:"Pássaros", i:"🐦"},
+            {n:13, name:"Criança", i:"👶"}, {n:14, name:"Raposa", i:"🦊"}, {n:15, name:"Urso", i:"🐻"}, {n:16, name:"Estrelas", i:"🌟"},
+            {n:17, name:"Cegonha", i:"🦢"}, {n:18, name:"Cão", i:"🐕"}, {n:19, name:"Torre", i:"🏰"}, {n:20, name:"Jardim", i:"🌳"},
+            {n:21, name:"Montanha", i:"⛰️"}, {n:22, name:"Caminho", i:"🛤️"}, {n:23, name:"Ratos", i:"🐀"}, {n:24, name:"Coração", i:"❤️"},
+            {n:25, name:"Anel", i:"💍"}, {n:26, name:"Livro", i:"📖"}, {n:27, name:"Carta", i:"✉️"}, {n:28, name:"Homem", i:"👨"},
+            {n:29, name:"Mulher", i:"👩"}, {n:30, name:"Lírios", i:"⚜️"}, {n:31, name:"Sol", i:"☀️"}, {n:32, name:"Lua", i:"🌙"},
+            {n:33, name:"Chave", i:"🗝️"}, {n:34, name:"Peixes", i:"🐟"}, {n:35, name:"Âncora", i:"⚓"}, {n:36, name:"Cruz", i:"✝️"}
+        ];
+
+        let state = { gender: 'Homem', targetQty: 0, currentCards: [], phase: 'start' };
+
+        function setGender(g) {
+            state.gender = g;
+            document.querySelectorAll('.gender-opt').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === g || (g === 'Outro' && btn.innerText === 'Outro'));
+            });
+        }
+
+        function resetGame() {
+            document.getElementById('table').innerHTML = '';
+            document.getElementById('table').className = 'grid';
+            document.getElementById('deck-view').style.display = 'none';
+            document.getElementById('qty-selector').classList.remove('visible');
+            document.getElementById('report').style.display = 'none';
+            document.getElementById('btn-read').disabled = true;
+            document.getElementById('btn-close').disabled = true;
+            document.getElementById('btn-deal').disabled = false;
+            document.getElementById('btn-deal').innerText = "🎲 Abrir";
+            state.phase = 'start';
+        }
+
+        function initDeal() {
+            resetGame();
+            document.getElementById('deck-view').style.display = 'flex';
+            document.getElementById('btn-deal').disabled = true;
+        }
+
+        function showQtySelector() {
+            if (state.phase !== 'start') return;
+            document.getElementById('qty-selector').classList.add('visible');
+            document.getElementById('deck-view').style.opacity = '0.3';
+        }
+
+        function confirmQty(qty) {
+            state.targetQty = qty;
+            state.phase = 'ready';
+            document.getElementById('qty-selector').classList.remove('visible');
+            document.getElementById('deck-view').style.display = 'none';
+
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            state.currentCards = [];
+
+            if (qty === 36) {
+                table.classList.add('mesa-real');
+                state.currentCards = [...deck].sort(() => Math.random() - 0.5);
+            } else {
+                state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, qty);
+            }
+
+            state.currentCards.forEach((c, i) => {
+                const d = document.createElement('div');
+                d.className = 'card';
+                d.innerHTML = `<div class="card-content"><div class="card-inner"></div><div class="card-name"></div></div>`;
+                table.appendChild(d);
+                setTimeout(() => flipCard(d, c), 50 + (i * 40)); 
+            });
+
+            document.getElementById('btn-read').disabled = false;
+            document.getElementById('btn-close').disabled = false;
+        }
+
+        function flipCard(el, cardData) {
+            el.classList.add('flipped');
+            el.querySelector('.card-inner').innerText = cardData.i;
+            el.querySelector('.card-name').innerText = `${cardData.n} ${cardData.name}`;
+        }
+
+        async function read() {
+            if (state.phase !== 'ready') return;
+            const q = document.getElementById('question').value;
+            const loading = document.getElementById('loading');
+            const report = document.getElementById('report');
+            
+            loading.style.display = 'block';
+            report.style.display = 'none';
+            setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 100);
+
+            try {
+                let cardDescription = "";
+                if (state.targetQty === 36) {
+                    let rows = [];
+                    for(let i=0; i<36; i+=4) {
+                        const rowCards = state.currentCards.slice(i, i+4).map(c => `${c.name}(${c.n})`).join(", ");
+                        rows.push(`Linha ${Math.floor(i/4)+1}: [${rowCards}]`);
+                    }
+                    cardDescription = rows.join("\n");
+                } else {
+                    cardDescription = state.currentCards.map((c, idx) => `${idx+1}. ${c.name} (${c.n})`).join(", ");
+                }
+
+                const isMale = state.gender === 'Homem';
+                const significator = isMale ? "Homem (28)" : "Mulher (29)";
+                const promptContext = state.targetQty === 36 
+                    ? `INTERPRETAÇÃO DA MESA REAL. Consultante: ${state.gender}. Significador: ${significator}. Regras: Analise estrutura, vizinhança do significador e carta central. Visão geral.`
+                    : `Leitura de ${state.targetQty} cartas para ${state.gender}.`;
+
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEY}` },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [{
+                            role: "user",
+                            content: `Você é um Mestre de Lenormand. ${promptContext} Pergunta: "${q || 'Leitura Geral'}". Cartas: ${cardDescription}. Interpretação profunda e direta. Max 15 linhas.`
+                        }],
+                        temperature: 0.7
+                    })
+                });
+
+                if (!res.ok) throw new Error("API Fail");
+                const data = await res.json();
+                let text = data.choices?.[0]?.message?.content;
+                if (!text) throw new Error("No content");
+
+                loading.style.display = 'none';
+                report.innerText = text;
+                report.style.display = 'block';
+
+            } catch(e) {
+                loading.style.display = 'none';
+                report.innerText = "Erro na conexão. Verifique sua internet.";
+                report.style.display = 'block';
+            }
+        }
+
+        // PWA Setup
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-prompt').style.display = 'block';
+        });
+
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') document.getElementById('install-prompt').style.display = 'none';
+                deferredPrompt = null;
+            }
+        }
+
+        // Manifest Injection for PWA
+        const manifest = {
+            "name": "Lenormand AI",
+            "short_name": "Lenormand",
+            "start_url": ".",
+            "display": "standalone",
+            "background_color": "#050505",
+            "theme_color": "#050505",
+            "icons": [{ "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzA1MDUwNSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkyDwn5OoPC90ZXh0Pjwvc3ZnPg==", "sizes": "192x192", "type": "image/svg+xml" }]
+        };
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
+    </script>
+</body>
+</html>
