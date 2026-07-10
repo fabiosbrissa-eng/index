@@ -2,13 +2,30 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0a0a">
 <title>LENORMAND AI</title>
 <style>
-:root { --gold: #d4af37; --bg: #0a0a0a; --card-bg: #141414; --input-bg: #1a1a1a; --border: #2a2a2a; --text: #e0e0e0; }
+:root {
+--gold: #d4af37;
+--bg: #0a0a0a;
+--card-bg: #141414;
+--input-bg: #1a1a1a;
+--border: #2a2a2a;
+--text: #e0e0e0;
+}
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+background: var(--bg);
+color: var(--text);
+margin: 0;
+padding: 20px 15px 40px 15px;
+display: flex;
+flex-direction: column;
+align-items: center;
+min-height: 100vh;
+}
 
 h1 { color: var(--gold); margin: 0 0 5px 0; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; text-align: center; font-weight: 300; }
 .sub { color: #666; font-size: 0.7rem; margin-bottom: 25px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
@@ -16,7 +33,10 @@ h1 { color: var(--gold); margin: 0 0 5px 0; font-size: 1.8rem; text-transform: u
 .main-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
 .section-label { color: #8a7020; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; display: block; }
 
-input, textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); padding: 14px; border-radius: 10px; font-family: inherit; font-size: 15px; }
+input, textarea {
+width: 100%; background: var(--input-bg); border: 1px solid var(--border);
+color: var(--text); padding: 14px; border-radius: 10px; font-family: inherit; font-size: 15px;
+}
 input:focus, textarea:focus { border-color: var(--gold); }
 textarea { height: 80px; resize: none; margin-top: 5px; }
 input::placeholder { color: #444; }
@@ -32,7 +52,10 @@ input::placeholder { color: #444; }
 .qty-btn.selected { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
 
 .action-group { display: flex; gap: 12px; margin-top: 10px; }
-button.action-btn { background: #111; border: 1px solid var(--gold); color: var(--gold); padding: 16px; cursor: pointer; text-transform: uppercase; font-weight: 700; border-radius: 10px; transition: 0.3s; flex: 1; font-size: 0.85rem; letter-spacing: 1px; }
+button.action-btn {
+background: #111; border: 1px solid var(--gold); color: var(--gold); padding: 16px; cursor: pointer;
+text-transform: uppercase; font-weight: 700; border-radius: 10px; transition: 0.3s; flex: 1; font-size: 0.85rem; letter-spacing: 1px;
+}
 button.action-btn:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
 button.action-btn:disabled { border-color: #333; color: #444; opacity: 0.5; cursor: not-allowed; }
 button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 60px; flex: none; }
@@ -42,21 +65,32 @@ button.btn-clear:hover { background: #551111; color: #fff; }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 350px; }
 .grid.mesa-real { grid-template-columns: repeat(4, 1fr); max-width: 100%; gap: 6px; }
 
-.card { width: 100%; aspect-ratio: 2.5/3.5; background: var(--card-bg); border: 1px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: default; }
+.card {
+width: 100%; aspect-ratio: 2.5/3.5; background: var(--card-bg); border: 1px solid #333; border-radius: 8px;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+position: relative; transition: transform 0.6s; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
 .mesa-real.card { aspect-ratio: 3/4; border-radius: 5px; }
 .mesa-real.card-inner { font-size: 1.6rem; }
 .mesa-real.card-name { font-size: 0.45rem; }
 
-.card.flipped { border-color: var(--gold); background: #1e1e1e; transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-.card-inner { font-size: 2.4rem; line-height: 1; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+.card.flipped { border-color: var(--gold); background: #1e1e1e; transform: translateY(-5px); }
+.card-inner { font-size: 2.4rem; line-height: 1; margin-bottom: 5px; }
 .card-name { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; text-align: center; line-height: 1.1; opacity: 0; transition: opacity 0.4s; font-weight: 700; letter-spacing: 0.5px; }
-.card.flipped.card-name { opacity: 1; }
+.card.flipped .card-name { opacity: 1; }
 
-/* Verso da carta (antes de virar) */
-.card-back { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px); border-radius: 8px; backface-visibility: hidden; z-index: 2; display: flex; align-items: center; justify-content: center; }
-.card.flipped.card-back { display: none; }
+.card-back {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
+border-radius: 8px; z-index: 2; display: flex; align-items: center; justify-content: center;
+}
+.card.flipped .card-back { display: none; }
 
-.report { max-width: 600px; width: 100%; background: #111; border-left: 4px solid var(--gold); padding: 25px; margin-top: 30px; line-height: 1.8; white-space: pre-wrap; display: none; font-size: 1rem; color: #ccc; border-radius: 0 12px 12px 0; }
+.report {
+max-width: 600px; width: 100%; background: #111; border-left: 4px solid var(--gold);
+padding: 25px; margin-top: 30px; line-height: 1.8; white-space: pre-wrap;
+display: none; font-size: 1rem; color: #ccc; border-radius: 0 12px 12px 0;
+}
 .loading { color: var(--gold); display: none; text-align: center; margin-top: 30px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; }
 .loading span { animation: blink 1.4s infinite both; }
 @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
@@ -83,9 +117,9 @@ button.btn-clear:hover { background: #551111; color: #fff; }
 <div>
 <label class="section-label">Gênero</label>
 <div class="gender-select">
-<button class="gender-opt active" onclick="setGender('Homem')">Masc</button>
-<button class="gender-opt" onclick="setGender('Mulher')">Fem</button>
-<button class="gender-opt" onclick="setGender('Outro')">Outro</button>
+<button class="gender-opt active" onclick="setGender('Homem')" aria-label="Masculino">Masc</button>
+<button class="gender-opt" onclick="setGender('Mulher')" aria-label="Feminino">Fem</button>
+<button class="gender-opt" onclick="setGender('Outro')" aria-label="Outro">Outro</button>
 </div>
 </div>
 </div>
@@ -93,16 +127,16 @@ button.btn-clear:hover { background: #551111; color: #fff; }
 <div>
 <label class="section-label">Tipo de Tiragem</label>
 <div class="qty-select">
-<button class="qty-btn selected" onclick="selectQty(1, this)">1 Carta</button>
-<button class="qty-btn" onclick="selectQty(3, this)">3 Cartas</button>
-<button class="qty-btn" onclick="selectQty(9, this)">9 Cartas</button>
-<button class="qty-btn" onclick="selectQty(36, this)">Mesa Real</button>
+<button class="qty-btn selected" onclick="selectQty(1, this)" aria-label="1 carta">1 Carta</button>
+<button class="qty-btn" onclick="selectQty(3, this)" aria-label="3 cartas">3 Cartas</button>
+<button class="qty-btn" onclick="selectQty(9, this)" aria-label="9 cartas">9 Cartas</button>
+<button class="qty-btn" onclick="selectQty(36, this)" aria-label="Mesa real">Mesa Real</button>
 </div>
 </div>
 
 <div>
 <label class="section-label">Pergunta (Opcional)</label>
-<textarea id="question" placeholder="Foque na sua intenção..."></textarea>
+<textarea id="question" placeholder="Digite sua pergunta..."></textarea>
 </div>
 
 <div class="action-group">
@@ -125,15 +159,15 @@ const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const MODEL = "llama-3.1-8b-instant";
 
 const deck = [
-{n:1, name:"Cavaleiro", i:"🏇"}, {n:2, name:"Trevo", i:"☘️"}, {n:3, name:"Navio", i:"⛵"}, {n:4, name:"Casa", i:"🏠"},
-{n:5, name:"Árvore", i:"🌳"}, {n:6, name:"Nuvens", i:"☁️"}, {n:7, name:"Cobra", i:"🐍"}, {n:8, name:"Caixão", i:"⚰️"},
-{n:9, name:"Buquê", i:"💐"}, {n:10, name:"Foice", i:"🌾"}, {n:11, name:"Chicote", i:"🎢"}, {n:12, name:"Pássaros", i:"🐦"},
-{n:13, name:"Criança", i:"👶"}, {n:14, name:"Raposa", i:"🦊"}, {n:15, name:"Urso", i:"🐻"}, {n:16, name:"Estrelas", i:"🌟"},
-{n:17, name:"Cegonha", i:"🦢"}, {n:18, name:"Cão", i:"🐕"}, {n:19, name:"Torre", i:"🏰"}, {n:20, name:"Jardim", i:"🌳"},
-{n:21, name:"Montanha", i:"⛰️"}, {n:22, name:"Caminho", i:"🛤️"}, {n:23, name:"Ratos", i:"🐀"}, {n:24, name:"Coração", i:"❤️"},
-{n:25, name:"Anel", i:"💍"}, {n:26, name:"Livro", i:"📖"}, {n:27, name:"Carta", i:"✉️"}, {n:28, name:"Homem", i:"👨"},
-{n:29, name:"Mulher", i:"👩"}, {n:30, name:"Lírios", i:"⚜️"}, {n:31, name:"Sol", i:"☀️"}, {n:32, name:"Lua", i:"🌙"},
-{n:33, name:"Chave", i:"🗝️"}, {n:34, name:"Peixes", i:"🐟"}, {n:35, name:"Âncora", i:"⚓"}, {n:36, name:"Cruz", i:"✝️"}
+{ n:1, name: "Cavaleiro", i: "🏇" }, { n:2, name: "Trevo", i: "☘️" }, { n:3, name: "Navio", i: "⛵" }, { n:4, name: "Casa", i: "🏠" },
+{ n:5, name: "Árvore", i: "🌳" }, { n:6, name: "Nuvens", i: "☁️" }, { n:7, name: "Cobra", i: "🐍" }, { n:8, name: "Caixão", i: "⚰️" },
+{ n:9, name: "Buquê", i: "💐" }, { n:10, name: "Foice", i: "🌾" }, { n:11, name: "Chicote", i: "🎢" }, { n:12, name: "Pássaros", i: "🐦" },
+{ n:13, name: "Criança", i: "👶" }, { n:14, name: "Raposa", i: "🦊" }, { n:15, name: "Urso", i: "🐻" }, { n:16, name: "Estrelas", i: "🌟" },
+{ n:17, name: "Cegonha", i: "🦢" }, { n:18, name: "Cão", i: "🐕" }, { n:19, name: "Torre", i: "🏰" }, { n:20, name: "Jardim", i: "🌳" },
+{ n:21, name: "Montanha", i: "⛰️" }, { n:22, name: "Caminho", i: "🛤️" }, { n:23, name: "Ratos", i: "🐀" }, { n:24, name: "Coração", i: "❤️" },
+{ n:25, name: "Anel", i: "💍" }, { n:26, name: "Livro", i: "📖" }, { n:27, name: "Carta", i: "✉️" }, { n:28, name: "Homem", i: "👨" },
+{ n:29, name: "Mulher", i: "👩" }, { n:30, name: "Lírios", i: "⚜️" }, { n:31, name: "Sol", i: "☀️" }, { n:32, name: "Lua", i: "🌙" },
+{ n:33, name: "Chave", i: "🗝️" }, { n:34, name: "Peixes", i: "🐟" }, { n:35, name: "Âncora", i: "⚓" }, { n:36, name: "Cruz", i: "✝️" }
 ];
 
 let state = { gender: 'Homem', targetQty: 1, currentCards: [] };
@@ -142,7 +176,7 @@ let consulenteData = { nome: '', nasc: '' };
 function setGender(g) {
 state.gender = g;
 document.querySelectorAll('.gender-opt').forEach(btn => {
-btn.classList.toggle('active', btn.innerText === (g === 'Homem'? 'Masc': g === 'Mulher'? 'Fem': 'Outro'));
+btn.classList.toggle('active', btn.textContent.trim() === (g === 'Homem' ? 'Masc' : g === 'Mulher' ? 'Fem' : 'Outro'));
 });
 }
 
@@ -153,8 +187,9 @@ btn.classList.add('selected');
 }
 
 function resetGame() {
-document.getElementById('table').innerHTML = '';
-document.getElementById('table').className = 'grid';
+const table = document.getElementById('table');
+table.innerHTML = '';
+table.className = 'grid';
 document.getElementById('report').style.display = 'none';
 document.getElementById('btn-read').disabled = true;
 document.getElementById('btn-read').style.display = 'none';
@@ -162,7 +197,7 @@ document.getElementById('btn-close').disabled = true;
 
 const btnDeal = document.getElementById('btn-deal');
 btnDeal.disabled = false;
-btnDeal.innerText = "🔮 Embaralhar & Abrir";
+btnDeal.textContent = "🔮 Embaralhar & Abrir";
 btnDeal.style.display = 'block';
 
 document.getElementById('consulente-nome').disabled = false;
@@ -175,12 +210,10 @@ function startReading() {
 const nome = document.getElementById('consulente-nome').value.trim();
 const nasc = document.getElementById('consulente-nasc').value;
 
-if(!nome) {
-document.getElementById('consulente-nome').focus();
-document.getElementById('consulente-nome').style.borderColor = '#ff4d4d';
+if (!nome) {
+alert("Por favor, digite o nome do consulente.");
 return;
 }
-document.getElementById('consulente-nome').style.borderColor = '';
 
 consulenteData.nome = nome;
 consulenteData.nasc = nasc || "não informada";
@@ -191,7 +224,7 @@ document.getElementById('question').disabled = true;
 document.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
 
 const btnDeal = document.getElementById('btn-deal');
-btnDeal.innerText = "🔮 Embaralhando...";
+btnDeal.textContent = "🔮 Embaralhando...";
 btnDeal.disabled = true;
 
 const table = document.getElementById('table');
@@ -207,16 +240,23 @@ state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, state.ta
 }
 
 state.currentCards.forEach((c, i) => {
-const d = document.createElement('div');
-d.className = 'card';
-// Verso da carta
-d.innerHTML = `<div class="card-back"></div><div class="card-content" style="opacity:0"><div class="card-inner">${c.i}</div><div class="card-name">${c.n} ${c.name}</div></div>`;
-table.appendChild(d);
-// Virar carta com delay
+const cardEl = document.createElement('div');
+cardEl.className = 'card';
+// Verso + conteúdo da carta
+cardEl.innerHTML = `
+<div class="card-back"></div>
+<div class="card-content" style="opacity:0">
+<div class="card-inner">${c.i}</div>
+<div class="card-name">${c.n} ${c.name}</div>
+</div>
+`;
+table.appendChild(cardEl);
+
+// Virar carta com delay sequencial
 setTimeout(() => {
-d.classList.add('flipped');
-d.querySelector('.card-content').style.opacity = '1';
-}, 300 + (i * 100));
+cardEl.classList.add('flipped');
+cardEl.querySelector('.card-content').style.opacity = '1';
+}, 300 + (i * 120));
 });
 
 setTimeout(() => {
@@ -225,7 +265,7 @@ document.getElementById('btn-read').style.display = 'block';
 document.getElementById('btn-read').disabled = false;
 document.getElementById('btn-close').disabled = false;
 document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
-}, state.currentCards.length  100 + 800);
+}, (state.currentCards.length * 120) + 800);
 }
 
 async function read() {
@@ -241,8 +281,8 @@ try {
 let cardDescription = "";
 if (state.targetQty === 36) {
 let rows = [];
-for(let i=0; i<36; i+=4) {
-const rowCards = state.currentCards.slice(i, i+4).map(c => `${c.name}(${c.n})`).join(", ");
+for (let i = 0; i < 36; i += 4) {
+const rowCards = state.currentCards.slice(i, i + 4).map(c => `${c.name}(${c.n})`).join(", ");
 rows.push(`Linha ${Math.floor(i/4)+1}: [${rowCards}]`);
 }
 cardDescription = rows.join("\n");
@@ -250,36 +290,34 @@ cardDescription = rows.join("\n");
 cardDescription = state.currentCards.map((c, idx) => `${idx+1}. ${c.name} (${c.n})`).join(", ");
 }
 
-const promptContext = state.targetQty === 36
-? `INTERPRETAÇÃO MESA REAL. Consultante: ${consulenteData.nome} (${state.gender}, nasc: ${consulenteData.nasc}).`
-: `Leitura para ${consulenteData.nome} (${state.gender}, nasc: ${consulenteData.nasc}).`;
-
 const res = await fetch(API_URL, {
 method: 'POST',
-headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEY}` },
+headers: {
+'Content-Type': 'application/json',
+'Authorization': `Bearer ${KEY}`
+},
 body: JSON.stringify({
 model: MODEL,
 messages: [{
 role: "user",
-content: `Mestre Lenormand. ${promptContext} Pergunta: "${q || 'Geral'}". Cartas: ${cardDescription}. Interpretação direta e profunda. Max 20 linhas.`
+content: `Mestre Lenormand. Interpretar para ${consulenteData.nome} (${state.gender}, nascido em ${consulenteData.nasc}). Pergunta: "${q || 'Questão geral'}". Cartas sorteadas: ${cardDescription}. Dê uma interpretação profunda e direta. Max 20 linhas.`
 }],
 temperature: 0.7
 })
 });
 
 const data = await res.json();
-let text = data.choices?.?.message?.content;
-
+const text = data.choices?.[0]?.message?.content || "Erro na resposta da API.";
 loading.style.display = 'none';
-report.innerText = text || "Erro na resposta.";
+report.textContent = text;
 report.style.display = 'block';
 report.scrollIntoView({ behavior: 'smooth' });
 
-} catch(e) {
+} catch (e) {
 loading.style.display = 'none';
-report.innerText = "Erro de conexão. Verifique a chave API.";
-report.style.display = 'block';
-console.error(e);
+document.getElementById('report').textContent = "Erro ao conectar à API Groq.";
+document.getElementById('report').style.display = 'block';
+console.error("Erro na API:", e);
 }
 }
 </script>
