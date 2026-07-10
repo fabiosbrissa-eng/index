@@ -1,637 +1,333 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a0a">
-<meta name="description" content="Lenormand AI - Leitura de Cartas Premium">
-<title>LENORMAND AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>LENORMAND AI</title>
+    
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBhMGEwYSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkyDwn5OoPC90ZXh0Pjwvc3ZnPg==">
 
-<!-- Ícone -->
-<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBhMGEwYSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkyDwn5OoPC90ZXh0Pjwvc3ZnPg==">
+    <style>
+        :root { 
+            --gold: #d4af37; 
+            --gold-dim: #8a7020;
+            --bg: #0a0a0a; 
+            --input-bg: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+        }
 
-<style>
-:root {
---gold: #d4af37;
---gold-dim: #8a7020;
---bg: #0a0a0a;
---card-bg: #141414;
---input-bg: #1a1a1a;
---border: #2a2a2a;
---text: #e0e0e0;
---text-dim: #888;
-}
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px 15px 40px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; outline: none; }
+        h1 { color: var(--gold); margin: 0 0 5px 0; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; text-align: center; font-weight: 300; }
+        .sub { color: #666; font-size: 0.7rem; margin-bottom: 25px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .main-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
 
-body {
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-background: var(--bg);
-color: var(--text);
-margin: 0;
-padding: 20px 15px 40px 15px;
-display: flex;
-flex-direction: column;
-align-items: center;
-min-height: 100vh;
-overscroll-behavior: none;
-}
+        .section-label { color: var(--gold-dim); font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; display: block; }
 
-h1 {
-color: var(--gold);
-margin: 0 0 5px 0;
-font-size: 1.8rem;
-text-transform: uppercase;
-letter-spacing: 3px;
-text-align: center;
-font-weight: 300;
-text-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
-}
-.sub {
-color: var(--text-dim);
-font-size: 0.7rem;
-margin-bottom: 25px;
-text-align: center;
-text-transform: uppercase;
-letter-spacing: 2px;
-}
+        input[type="text"], input[type="date"], textarea { 
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border); 
+            color: var(--text); padding: 14px; border-radius: 10px; font-family: inherit; font-size: 15px;
+        }
+        input[type="date"] { color: #888; }
+        input[type="date"]:valid { color: var(--text); }
+        
+        input:focus, textarea:focus { border-color: var(--gold); }
+        textarea { height: 80px; resize: none; margin-top: 5px; }
 
-.main-container {
-width: 100%;
-max-width: 500px;
-display: flex;
-flex-direction: column;
-gap: 15px;
-transition: opacity 0.3s;
-}
+        .info-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; align-items: start; }
 
-.section-label {
-color: var(--gold-dim);
-font-size: 0.75rem;
-margin-bottom: 6px;
-text-transform: uppercase;
-letter-spacing: 1px;
-font-weight: 600;
-display: block;
-}
+        .gender-select {
+            display: flex; background: var(--input-bg); border-radius: 10px; padding: 2px; border: 1px solid var(--border); height: 52px;
+        }
+        .gender-opt {
+            flex: 1; background: transparent; border: none; color: #666; cursor: pointer; border-radius: 8px; transition: 0.3s; font-weight: 500;
+        }
+        .gender-opt.active { background: var(--gold); color: #000; font-weight: 700; }
 
-input[type="text"], input[type="date"], textarea {
-width: 100%;
-background: var(--input-bg);
-border: 1px solid var(--border);
-color: var(--text);
-padding: 14px;
-border-radius: 10px;
-font-family: inherit;
-font-size: 15px;
-transition: 0.3s;
-box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
--webkit-appearance: none; /* Remove estilo padrão do iOS */
-}
+        .qty-select { display: flex; gap: 8px; background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
+        .qty-btn {
+            flex: 1; background: #222; border: 1px solid #333; color: #666; padding: 12px; font-size: 0.85rem; cursor: pointer; border-radius: 8px; font-weight: 600;
+        }
+        .qty-btn.selected { background: var(--gold); color: #000; border-color: var(--gold); }
 
-input[type="date"] {
-color: var(--text-dim);
-}
-input[type="date"]:valid {
-color: var(--text);
-}
+        .action-group { display: flex; gap: 12px; margin-top: 10px; }
+        
+        button.action-btn { 
+            background: #111; border: 1px solid var(--gold); color: var(--gold); padding: 16px; cursor: pointer; 
+            text-transform: uppercase; font-weight: 700; border-radius: 10px; transition: 0.3s; flex: 1; font-size: 0.85rem; letter-spacing: 1px;
+        }
+        button.action-btn:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        button.action-btn:disabled { border-color: #333; color: #444; opacity: 0.5; cursor: not-allowed; }
+        
+        button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 60px; flex: none; }
+        button.btn-clear:hover { background: #551111; color: #fff; }
 
-input:focus, textarea:focus {
-border-color: var(--gold);
-box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-}
+        .grid-container { width: 100%; max-width: 600px; display: flex; justify-content: center; margin: 30px auto 0; perspective: 1000px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 350px; }
+        .grid.mesa-real { grid-template-columns: repeat(4, 1fr); max-width: 100%; gap: 6px; }
 
-textarea { height: 80px; resize: none; margin-top: 5px; }
-input::placeholder, textarea::placeholder { color: #444; }
+        .card { 
+            width: 100%; aspect-ratio: 2.5/3.5; background: #141414; border: 1px solid #333; border-radius: 8px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            position: relative; transition: transform 0.5s; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .mesa-real .card { aspect-ratio: 3/4; border-radius: 5px; }
+        .mesa-real .card-inner { font-size: 1.6rem; }
+        .mesa-real .card-name { font-size: 0.45rem; }
 
-.info-grid {
-display: grid;
-grid-template-columns: 1.5fr 1fr; /* Ajustado para Data e Gênero */
-gap: 15px;
-align-items: start;
-}
+        .card.flipped { border-color: var(--gold); background: #1e1e1e; transform: translateY(-5px); }
+        .card-inner { font-size: 2.4rem; margin-bottom: 5px; }
+        .card-name { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; text-align: center; opacity: 0; transition: 0.4s; font-weight: 700; }
+        .card.flipped .card-name { opacity: 1; }
 
-.gender-select {
-display: flex;
-background: var(--input-bg);
-border-radius: 10px;
-padding: 2px;
-border: 1px solid var(--border);
-justify-content: space-between;
-height: 52px; /* Altura fixa para alinhar com input de data */
-}
-.gender-opt {
-flex: 1;
-background: transparent;
-border: none;
-color: var(--text-dim);
-padding: 12px 5px;
-font-size: 0.8rem;
-cursor: pointer;
-border-radius: 8px;
-transition: 0.3s;
-font-weight: 500;
-display: flex;
-align-items: center;
-justify-content: center;
-}
-.gender-opt.active {
-background: var(--gold);
-color: #000;
-font-weight: 700;
-box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
-}
-
-/* Seletor de Quantidade Integrado */
-.qty-select {
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-background: var(--input-bg);
-padding: 10px;
-border-radius: 12px;
-border: 1px solid var(--border);
-margin-bottom: 10px;
-}
-
-.qty-btn {
-flex: 1;
-min-width: 60px;
-background: #222;
-border: 1px solid #333;
-color: var(--text-dim);
-padding: 12px;
-font-size: 0.85rem;
-cursor: pointer;
-border-radius: 8px;
-font-weight: 600;
-transition: 0.2s;
-}
-.qty-btn:hover { border-color: var(--gold); color: var(--text); }
-.qty-btn.selected {
-background: var(--gold);
-color: #000;
-border-color: var(--gold);
-box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-}
-
-.action-group {
-display: flex;
-gap: 12px;
-margin-top: 10px;
-}
-
-button.action-btn {
-background: linear-gradient(145deg, #1a1a1a, #111);
-border: 1px solid var(--gold);
-color: var(--gold);
-padding: 16px;
-cursor: pointer;
-text-transform: uppercase;
-font-weight: 700;
-border-radius: 10px;
-transition: all 0.3s ease;
-flex: 1;
-font-size: 0.85rem;
-letter-spacing: 1.5px;
-}
-
-button.action-btn:hover:not(:disabled) {
-background: var(--gold);
-color: #000;
-box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-transform: translateY(-2px);
-}
-button.action-btn:active:not(:disabled) { transform: scale(0.98); }
-
-button.action-btn:disabled {
-border-color: #333;
-color: #444;
-cursor: not-allowed;
-background: #111;
-opacity: 0.5;
-}
-
-button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 60px; flex: none; }
-button.btn-clear:hover { background: #551111; color: #fff; border-color: #ff4d4d; }
-
-/* Cards & Grid */
-.grid-container {
-width: 100%;
-max-width: 600px;
-display: flex;
-justify-content: center;
-margin: 30px auto 0;
-perspective: 1000px;
-min-height: 50px;
-}
-
-.grid {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 12px;
-width: 100%;
-max-width: 350px;
-}
-
-.grid.mesa-real {
-grid-template-columns: repeat(4, 1fr);
-max-width: 100%;
-gap: 6px;
-}
-
-.card {
-width: 100%;
-aspect-ratio: 2.5/3.5;
-background: var(--card-bg);
-border: 1px solid #333;
-border-radius: 8px;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-position: relative;
-transform-style: preserve-3d;
-transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-}
-
-.mesa-real.card { aspect-ratio: 3/4; border-width: 1px; border-radius: 5px; }
-.mesa-real.card-inner { font-size: 1.6rem; }
-.mesa-real.card-name { font-size: 0.45rem; }
-
-.card.flipped {
-border-color: var(--gold);
-background: #1e1e1e;
-box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
-transform: translateY(0);
-}
-
-.card-content {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-width: 100%;
-height: 100%;
-backbackface-visibility: hidden;
-}
-
-.card-inner { font-size: 2.4rem; pointer-events: none; line-height: 1; margin-bottom: 5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-.card-name {
-font-size: 0.75rem;
-color: var(--gold);
-text-transform: uppercase;
-text-align: center;
-line-height: 1.1;
-opacity: 0;
-transition: opacity 0.4s;
-font-weight: 700;
-letter-spacing: 0.5px;
-}
-.card.flipped.card-name { opacity: 1; }
-
-@keyframes shake {
-0% { transform: translate(1px, 1px) rotate(0deg); }
-10% { transform: translate(-1px, -2px) rotate(-1deg); }
-20% { transform: translate(-3px, 0px) rotate(1deg); }
-30% { transform: translate(3px, 2px) rotate(0deg); }
-40% { transform: translate(1px, -1px) rotate(1deg); }
-50% { transform: translate(-1px, 2px) rotate(-1deg); }
-60% { transform: translate(-3px, 1px) rotate(0deg); }
-70% { transform: translate(3px, 1px) rotate(-1deg); }
-80% { transform: translate(-1px, -1px) rotate(1deg); }
-90% { transform: translate(1px, 2px) rotate(0deg); }
-100% { transform: translate(1px, -2px) rotate(-1deg); }
-}
-.shuffling { animation: shake 0.5s; animation-iteration-count: 2; }
-
-.report {
-max-width: 600px;
-width: 100%;
-background: #111;
-border-left: 4px solid var(--gold);
-padding: 25px;
-margin-top: 30px;
-line-height: 1.8;
-white-space: pre-wrap;
-display: none;
-font-size: 1rem;
-color: #ccc;
-border-radius: 0 12px 12px 0;
-box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.loading {
-color: var(--gold);
-display: none;
-text-align: center;
-margin-top: 30px;
-font-size: 0.85rem;
-text-transform: uppercase;
-letter-spacing: 3px;
-font-weight: 600;
-}
-.loading span { animation: blink 1.4s infinite both; }
-@keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
-
-#install-prompt {
-position: fixed;
-bottom: 30px;
-left: 50%;
-transform: translateX(-50%);
-background: var(--gold);
-color: #000;
-padding: 12px 24px;
-border-radius: 50px;
-font-weight: 700;
-box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-display: none;
-z-index: 1000;
-cursor: pointer;
-font-size: 0.9rem;
-}
-</style>
+        .report { 
+            max-width: 600px; width: 100%; background: #111; border-left: 4px solid var(--gold); padding: 25px; 
+            margin-top: 30px; line-height: 1.8; white-space: pre-wrap; display: none; font-size: 1rem; color: #ccc; 
+        }
+        .loading { color: var(--gold); display: none; text-align: center; margin-top: 30px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; }
+    </style>
 </head>
 <body>
 
-<div style="text-align: center; width: 100%; margin-bottom: 10px;">
-<h1>Lenormand AI</h1>
-<div class="sub">Oráculo Digital Premium</div>
-</div>
+    <div style="text-align: center; width: 100%;">
+        <h1>Lenormand AI</h1>
+        <div class="sub">Oráculo Digital</div>
+    </div>
 
-<div class="main-container" id="input-section">
+    <div class="main-container" id="input-section">
+        <div>
+            <label class="section-label">Consultante</label>
+            <input type="text" id="consulente-nome" placeholder="Nome completo">
+        </div>
 
-<div>
-<label class="section-label">Consultante</label>
-<input type="text" id="consulente-nome" placeholder="Nome completo" autocomplete="off">
-</div>
+        <div class="info-grid">
+            <div>
+                <label class="section-label">Data de Nascimento</label>
+                <input type="date" id="consulente-nasc">
+            </div>
+            <div>
+                <label class="section-label">Gênero</label>
+                <div class="gender-select">
+                    <button class="gender-opt active" onclick="setGender('Homem')">Masc</button>
+                    <button class="gender-opt" onclick="setGender('Mulher')">Fem</button>
+                    <button class="gender-opt" onclick="setGender('Outro')">Outro</button>
+                </div>
+            </div>
+        </div>
 
-<div class="info-grid">
-<div>
-<label class="section-label">Data de Nascimento</label>
-<input type="date" id="consulente-nasc">
-</div>
-<div>
-<label class="section-label">Gênero</label>
-<div class="gender-select">
-<button class="gender-opt active" onclick="setGender('Homem')">Masc</button>
-<button class="gender-opt" onclick="setGender('Mulher')">Fem</button>
-<button class="gender-opt" onclick="setGender('Outro')">Outro</button>
-</div>
-</div>
-</div>
+        <div>
+            <label class="section-label">Tiragem</label>
+            <div class="qty-select">
+                <button class="qty-btn selected" onclick="selectQty(1, this)">1 Carta</button>
+                <button class="qty-btn" onclick="selectQty(3, this)">3 Cartas</button>
+                <button class="qty-btn" onclick="selectQty(9, this)">9 Cartas</button>
+                <button class="qty-btn" onclick="selectQty(36, this)">Mesa Real</button>
+            </div>
+        </div>
 
-<div>
-<label class="section-label">Tipo de Tiragem</label>
-<div class="qty-select" id="qty-selector">
-<button class="qty-btn selected" onclick="selectQty(1, this)">1 Carta</button>
-<button class="qty-btn" onclick="selectQty(3, this)">3 Cartas</button>
-<button class="qty-btn" onclick="selectQty(9, this)">9 Cartas</button>
-<button class="qty-btn" onclick="selectQty(36, this)">Mesa Real</button>
-</div>
-</div>
+        <div>
+            <label class="section-label">Pergunta (Opcional)</label>
+            <textarea id="question" placeholder="Foque na sua intenção..."></textarea>
+        </div>
+        
+        <div class="action-group">
+            <button class="action-btn" id="btn-deal" onclick="startReading()">🔮 Embaralhar & Abrir</button>
+            <button class="action-btn" id="btn-read" onclick="read()" disabled style="display:none;">✨ Interpretar</button>
+            <button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
+        </div>
+    </div>
 
-<div>
-<label class="section-label">Sua Pergunta (Opcional)</label>
-<textarea id="question" placeholder="Foque na sua intenção..."></textarea>
-</div>
+    <div class="grid-container">
+        <div class="grid" id="table"></div>
+    </div>
 
-<div class="action-group">
-<button class="action-btn" id="btn-deal" onclick="startReading()">🔮 Embaralhar & Abrir</button>
-<button class="action-btn" id="btn-read" onclick="read()" disabled style="display:none;">✨ Interpretar</button>
-<button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
-</div>
-</div>
+    <div id="loading" class="loading">Consultando...<span>.</span><span>.</span><span>.</span></div>
+    <div id="report" class="report"></div>
 
-<div class="grid-container">
-<div class="grid" id="table"></div>
-</div>
+    <script>
+        const KEY = "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"; 
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        const MODEL = "llama-3.1-8b-instant";
 
-<div id="loading" class="loading">Consultando as Cartas<span>.</span><span>.</span><span>.</span></div>
-<div id="report" class="report"></div>
+        const deck = [
+            {n:1, name:"Cavaleiro", i:"🏇"}, {n:2, name:"Trevo", i:"☘️"}, {n:3, name:"Navio", i:"⛵"}, {n:4, name:"Casa", i:"🏠"},
+            {n:5, name:"Árvore", i:"🌳"}, {n:6, name:"Nuvens", i:"☁️"}, {n:7, name:"Cobra", i:"🐍"}, {n:8, name:"Caixão", i:"⚰️"},
+            {n:9, name:"Buquê", i:"💐"}, {n:10, name:"Foice", i:"🌾"}, {n:11, name:"Chicote", i:"🎢"}, {n:12, name:"Pássaros", i:"🐦"},
+            {n:13, name:"Criança", i:"👶"}, {n:14, name:"Raposa", i:"🦊"}, {n:15, name:"Urso", i:"🐻"}, {n:16, name:"Estrelas", i:"🌟"},
+            {n:17, name:"Cegonha", i:"🦢"}, {n:18, name:"Cão", i:"🐕"}, {n:19, name:"Torre", i:"🏰"}, {n:20, name:"Jardim", i:"🌳"},
+            {n:21, name:"Montanha", i:"⛰️"}, {n:22, name:"Caminho", i:"🛤️"}, {n:23, name:"Ratos", i:"🐀"}, {n:24, name:"Coração", i:"❤️"},
+            {n:25, name:"Anel", i:"💍"}, {n:26, name:"Livro", i:"📖"}, {n:27, name:"Carta", i:"✉️"}, {n:28, name:"Homem", i:"👨"},
+            {n:29, name:"Mulher", i:"👩"}, {n:30, name:"Lírios", i:"⚜️"}, {n:31, name:"Sol", i:"☀️"}, {n:32, name:"Lua", i:"🌙"},
+            {n:33, name:"Chave", i:"🗝️"}, {n:34, name:"Peixes", i:"🐟"}, {n:35, name:"Âncora", i:"⚓"}, {n:36, name:"Cruz", i:"✝️"}
+        ];
 
-<div id="install-prompt" onclick="installApp()">📲 Instalar App</div>
+        let state = { gender: 'Homem', targetQty: 1, currentCards: [] };
+        let consulenteData = { nome: '', nasc: '' };
 
-<script>
-const KEY = "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";
-const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = "llama-3.1-8b-instant";
+        function setGender(g) {
+            state.gender = g;
+            document.querySelectorAll('.gender-opt').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === (g === 'Homem' ? 'Masc' : g === 'Mulher' ? 'Fem' : 'Outro'));
+            });
+        }
 
-const deck = [
-{n:1, name:"Cavaleiro", i:"🏇"}, {n:2, name:"Trevo", i:"☘️"}, {n:3, name:"Navio", i:"⛵"}, {n:4, name:"Casa", i:"🏠"},
-{n:5, name:"Árvore", i:"🌳"}, {n:6, name:"Nuvens", i:"☁️"}, {n:7, name:"Cobra", i:"🐍"}, {n:8, name:"Caixão", i:"⚰️"},
-{n:9, name:"Buquê", i:"💐"}, {n:10, name:"Foice", i:"🌾"}, {n:11, name:"Chicote", i:"🎢"}, {n:12, name:"Pássaros", i:"🐦"},
-{n:13, name:"Criança", i:"👶"}, {n:14, name:"Raposa", i:"🦊"}, {n:15, name:"Urso", i:"🐻"}, {n:16, name:"Estrelas", i:"🌟"},
-{n:17, name:"Cegonha", i:"🦢"}, {n:18, name:"Cão", i:"🐕"}, {n:19, name:"Torre", i:"🏰"}, {n:20, name:"Jardim", i:"🌳"},
-{n:21, name:"Montanha", i:"⛰️"}, {n:22, name:"Caminho", i:"🛤️"}, {n:23, name:"Ratos", i:"🐀"}, {n:24, name:"Coração", i:"❤️"},
-{n:25, name:"Anel", i:"💍"}, {n:26, name:"Livro", i:"📖"}, {n:27, name:"Carta", i:"✉️"}, {n:28, name:"Homem", i:"👨"},
-{n:29, name:"Mulher", i:"👩"}, {n:30, name:"Lírios", i:"⚜️"}, {n:31, name:"Sol", i:"☀️"}, {n:32, name:"Lua", i:"🌙"},
-{n:33, name:"Chave", i:"🗝️"}, {n:34, name:"Peixes", i:"🐟"}, {n:35, name:"Âncora", i:"⚓"}, {n:36, name:"Cruz", i:"✝️"}
-];
+        function selectQty(qty, btn) {
+            state.targetQty = qty;
+            document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
 
-let state = { gender: 'Homem', targetQty: 1, currentCards: [], phase: 'start' };
-let consulenteData = { nome: '', nasc: '' };
+        function resetGame() {
+            document.getElementById('table').innerHTML = '';
+            document.getElementById('table').className = 'grid';
+            document.getElementById('report').style.display = 'none';
+            document.getElementById('btn-read').disabled = true;
+            document.getElementById('btn-read').style.display = 'none';
+            document.getElementById('btn-close').disabled = true;
+            
+            const btnDeal = document.getElementById('btn-deal');
+            btnDeal.disabled = false;
+            btnDeal.innerText = "🔮 Embaralhar & Abrir";
+            btnDeal.style.display = 'block';
+            
+            // Reabilita inputs
+            document.getElementById('consulente-nome').disabled = false;
+            document.getElementById('consulente-nasc').disabled = false;
+            document.getElementById('question').disabled = false;
+            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
+        }
 
-function setGender(g) {
-state.gender = g;
-document.querySelectorAll('.gender-opt').forEach(btn => {
-btn.classList.toggle('active', btn.innerText === (g === 'Homem'? 'Masc': g === 'Mulher'? 'Fem': 'Outro'));
-});
-}
+        function startReading() {
+            const nome = document.getElementById('consulente-nome').value.trim();
+            const nasc = document.getElementById('consulente-nasc').value;
+            
+            if(!nome) {
+                alert("Por favor, digite o nome do consulente.");
+                return;
+            }
 
-function selectQty(qty, btn) {
-state.targetQty = qty;
-document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
-btn.classList.add('selected');
-}
+            consulenteData.nome = nome;
+            consulenteData.nasc = nasc || "não informada";
 
-function resetGame() {
-document.getElementById('table').innerHTML = '';
-document.getElementById('table').className = 'grid';
-document.getElementById('report').style.display = 'none';
-document.getElementById('btn-read').disabled = true;
-document.getElementById('btn-read').style.display = 'none';
-document.getElementById('btn-close').disabled = true;
+            // Bloqueia UI
+            document.getElementById('consulente-nome').disabled = true;
+            document.getElementById('consulente-nasc').disabled = true;
+            document.getElementById('question').disabled = true;
+            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
 
-const btnDeal = document.getElementById('btn-deal');
-btnDeal.disabled = false;
-btnDeal.innerText = "🔮 Embaralhar & Abrir";
-btnDeal.style.display = 'block';
+            const btnDeal = document.getElementById('btn-deal');
+            btnDeal.innerText = "🔮 Embaralhando...";
+            btnDeal.disabled = true;
+            
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            state.currentCards = [];
 
-document.getElementById('consulente-nome').disabled = false;
-document.getElementById('consulente-nasc').disabled = false;
-document.getElementById('question').disabled = false;
-document.querySelectorAll('.qty-btn').forEach(b => b.style.pointerEvents = 'auto');
+            // Lógica de Distribuição
+            if (state.targetQty === 36) {
+                table.classList.add('mesa-real');
+                state.currentCards = [...deck].sort(() => Math.random() - 0.5);
+            } else {
+                table.classList.remove('mesa-real');
+                state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, state.targetQty);
+            }
 
-state.phase = 'start';
-}
+            // Renderiza cartas
+            state.currentCards.forEach((c, i) => {
+                const d = document.createElement('div');
+                d.className = 'card';
+                d.innerHTML = `<div class="card-inner" style="opacity:0.1">🎴</div>`; 
+                table.appendChild(d);
+                setTimeout(() => flipCard(d, c), 100 + (i * 50)); 
+            });
 
-function startReading() {
-const nome = document.getElementById('consulente-nome').value.trim();
-const nasc = document.getElementById('consulente-nasc').value;
+            setTimeout(() => {
+                btnDeal.style.display = 'none';
+                document.getElementById('btn-read').style.display = 'block';
+                document.getElementById('btn-read').disabled = false;
+                document.getElementById('btn-close').disabled = false;
+                document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, state.currentCards.length * 50 + 600);
+        }
 
-if(!nome) {
-document.getElementById('consulente-nome').focus();
-document.getElementById('consulente-nome').style.borderColor = '#ff4d4d';
-return;
-}
-document.getElementById('consulente-nome').style.borderColor = '';
+        function flipCard(el, cardData) {
+            el.classList.add('flipped');
+            el.innerHTML = `
+                <div class="card-inner">${cardData.i}</div>
+                <div class="card-name">${cardData.n} ${cardData.name}</div>
+            `;
+        }
 
-consulenteData.nome = nome;
-consulenteData.nasc = nasc || "não informada";
+        async function read() {
+            const q = document.getElementById('question').value;
+            const loading = document.getElementById('loading');
+            const report = document.getElementById('report');
+            
+            loading.style.display = 'block';
+            report.style.display = 'none';
+            loading.scrollIntoView({ behavior: 'smooth' });
 
-// Bloqueia inputs para não alterar durante leitura
-document.getElementById('consente-nasc').disabled = true;
-document.getElementById('question').disabled = true;
-document.querySelectorAll('.qty-btn').forEach(b => b.style.pointerEvents = 'none');
+            try {
+                let cardDescription = "";
+                if (state.targetQty === 36) {
+                    let rows = [];
+                    for(let i=0; i<36; i+=4) {
+                        const rowCards = state.currentCards.slice(i, i+4).map(c => `${c.name}(${c.n})`).join(", ");
+                        rows.push(`Linha ${Math.floor(i/4)+1}: [${rowCards}]`);
+                    }
+                    cardDescription = rows.join("\n");
+                } else {
+                    cardDescription = state.currentCards.map((c, idx) => `${idx+1}. ${c.name} (${c.n})`).join(", ");
+                }
 
-// UI Update
-const btnDeal = document.getElementById('btn-deal');
-btnDeal.innerText = "🔮 Embaralhando...";
-btnDeal.disabled = true;
+                const promptContext = state.targetQty === 36 
+                    ? `INTERPRETAÇÃO MESA REAL. Consultante: ${consulenteData.nome} (${state.gender}, nasc: ${consulenteData.nasc}).`
+                    : `Leitura para ${consulenteData.nome} (${state.gender}, nasc: ${consulenteData.nasc}).`;
 
-// Animação de embaralhar na tela (opcional, ou direto para distribuição)
-const table = document.getElementById('table');
-table.innerHTML = '';
-state.currentCards = [];
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEY}` },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [{
+                            role: "user",
+                            content: `Mestre Lenormand. ${promptContext} Pergunta: "${q || 'Geral'}". Cartas: ${cardDescription}. Interpretação direta e profunda. Max 20 linhas.`
+                        }],
+                        temperature: 0.7
+                    })
+                });
 
-if (state.targetQty === 36) {
-table.classList.add('mesa-real');
-state.currentCards = [...deck].sort(() => Math.random() - 0.5);
-} else {
-state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, state.targetQty);
-}
+                const data = await res.json();
+                let text = data.choices?.[0]?.message?.content;
+                
+                loading.style.display = 'none';
+                report.innerText = text || "Erro na resposta.";
+                report.style.display = 'block';
+                report.scrollIntoView({ behavior: 'smooth' });
 
-state.currentCards.forEach((c, i) => {
-const d = document.createElement('div');
-d.className = 'card';
-d.innerHTML = `<div class="card-content"><div class="card-inner" style="opacity:0.1">🎴</div></div>`;
-table.appendChild(d);
-setTimeout(() => flipCard(d, c), 100 + (i * 50));
-});
-
-setTimeout(() => {
-btnDeal.style.display = 'none';
-document.getElementById('btn-read').style.display = 'block';
-document.getElementById('btn-read').disabled = false;
-document.getElementById('btn-close').disabled = false;
-document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
-}, state.currentCards.length  50 + 600);
-}
-
-function flipCard(el, cardData) {
-el.classList.add('flipped');
-el.innerHTML = `
-<div class="card-content">
-<div class="card-inner">${cardData.i}</div>
-<div class="card-name">${cardData.n} ${cardData.name}</div>
-</div>
-`;
-}
-
-async function read() {
-const q = document.getElementById('question').value;
-const loading = document.getElementById('loading');
-const report = document.getElementById('report');
-
-loading.style.display = 'block';
-report.style.display = 'none';
-loading.scrollIntoView({ behavior: 'smooth' });
-
-try {
-let cardDescription = "";
-if (state.targetQty === 36) {
-let rows = [];
-for(let i=0; i<36; i+=4) {
-const rowCards = state.currentCards.slice(i, i+4).map(c => `${c.name}(${c.n})`).join(", ");
-rows.push(`Linha ${Math.floor(i/4)+1}: [${rowCards}]`);
-}
-cardDescription = rows.join("\n");
-} else {
-cardDescription = state.currentCards.map((c, idx) => `${idx+1}. ${c.name} (${c.n})`).join(", ");
-}
-
-const isMale = state.gender === 'Homem';
-const significator = isMale? "Homem (28)": (state.gender === 'Mulher'? "Mulher (29)": "Significador Neutro");
-
-const promptContext = state.targetQty === 36
-? `INTERPRETAÇÃO DA MESA REAL. Consultante: ${consulenteData.nome} (${state.gender}, nascido em ${consulenteData.nasc}). Significador provável: ${significator}. Regras: Analise a estrutura, a carta central (tema), a vizinhança do significador e cruzamentos. Visão geral profunda.`
-: `Leitura de ${state.targetQty} cartas para ${consulenteData.nome} (${state.gender}, nascido em ${consulenteData.nasc}).`;
-
-const res = await fetch(API_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${KEY}` },
-body: JSON.stringify({
-model: MODEL,
-messages: [{
-role: "user",
-content: `Você é um Mestre de Lenormand antigo e sábio, mas direto. ${promptContext} Pergunta: "${q || 'Leitura Geral / Conselho'}". Cartas sorteadas: ${cardDescription}. Forneça uma interpretação profunda, focada na situação do consulente, sem enrolação. Max 20 linhas.`
-}],
-temperature: 0.7
-})
-});
-
-if (!res.ok) throw new Error("API Fail");
-const data = await res.json();
-let text = data.choices?.?.message?.content;
-if (!text) throw new Error("No content");
-
-loading.style.display = 'none';
-report.innerText = text;
-report.style.display = 'block';
-report.scrollIntoView({ behavior: 'smooth' });
-
-} catch(e) {
-loading.style.display = 'none';
-report.innerText = "Erro na conexão com o Oráculo. Tente novamente.";
-report.style.display = 'block';
-console.error(e);
-}
-}
-
-// PWA Setup
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-e.preventDefault();
-deferredPrompt = e;
-setTimeout(() => {
-document.getElementById('install-prompt').style.display = 'block';
-}, 2000);
-});
-
-async function installApp() {
-if (deferredPrompt) {
-deferredPrompt.prompt();
-const { outcome } = await deferredPrompt.userChoice;
-if (outcome === 'accepted') document.getElementById('install-prompt').style.display = 'none';
-deferredPrompt = null;
-}
-}
-
-const manifest = {
-"name": "Lenormand AI",
-"short_name": "Lenormand",
-"start_url": ".",
-"display": "standalone",
-"background_color": "#0a0a0a",
-"theme_color": "#0a0a0a",
-"icons": [{
-"src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzBhMGEwYSIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1zaXplPSI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPvCfkyDwn5OoPC90ZXh0Pjwvc3ZnPg==",
-"sizes": "192x192",
-"type": "image/svg+xml"
-}]
-};
-const stringManifest = JSON.stringify(manifest);
-const blob = new Blob([stringManifest], {type: 'application/json'});
-const manifestURL = URL.createObjectURL(blob);
-const link = document.createElement('link');
-link.rel = 'manifest';
-link.href = manifestURL;
-document.head.appendChild(link);
-</script>
+            } catch(e) {
+                loading.style.display = 'none';
+                report.innerText = "Erro de conexão.";
+                report.style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
