@@ -3,97 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lenormand AI - Leitura Digital</title>
+    <meta name="theme-color" content="#0a0a0a">
+    <title>LENORMAND AI</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h1 { color: #333; text-align: center; margin-bottom: 1.5rem; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; color: #666; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #5c6bc0; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; transition: background 0.3s; }
-        button:hover { background-color: #3f51b5; }
-        .result { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-        .card { background: #e3f2fd; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; color: #1565c0; font-size: 0.9rem; }
-        .interpretation { background: #fff3e0; padding: 1rem; border-radius: 8px; color: #e65100; line-height: 1.6; }
-        .loading { text-align: center; color: #666; display: none; }
+        :root {
+            --gold: #d4af37;
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --input-bg: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --error: #ff4d4d;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px 15px 40px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: var(--gold);
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            font-weight: 300;
+        }
+        .sub { color: #666; font-size: 0.7rem; margin-bottom: 25px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        .main-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        .section-label { color: #8a7020; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; display: block; }
+        input, textarea, select {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+        }
+        input:focus, textarea:focus { border-color: var(--gold); }
+        textarea { height: 80px; resize: none; margin-top: 5px; }
+        input::placeholder { color: #444; }
+        .info-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; align-items: start; }
+        .gender-select { display: flex; background: var(--input-bg); border-radius: 10px; padding: 2px; border: 1px solid var(--border); height: 52px; }
+        .gender-opt { flex: 1; background: transparent; border: none; color: #666; cursor: pointer; border-radius: 8px; transition: 0.3s; font-weight: 500; font-size: 0.8rem; }
+        .gender-opt.active { background: var(--gold); color: #000; font-weight: 700; }
+        .qty-select { display: flex; flex-wrap: wrap; gap: 8px; background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
+        .qty-btn {
+            flex: 1; min-width: 80px; background: #222; border: 1px solid #333; color: #666;
+            padding: 12px 5px; font-size: 0.8rem; cursor: pointer; border-radius: 8px; font-weight: 600; transition: 0.2s; text-align: center;
+        }
+        .qty-btn:hover { border-color: var(--gold); color: var(--text); }
+        .qty-btn.selected { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        .action-group { display: flex; gap: 12px; margin-top: 10px; }
+        button.action-btn {
+            background: #111; border: 1px solid var(--gold); color: var(--gold);
+            padding: 16px; cursor: pointer; text-transform: uppercase; font-weight: 700;
+            border-radius: 10px; transition: 0.3s; flex: 1; font-size: 0.85rem; letter-spacing: 1px;
+        }
+        button.action-btn:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
+        button.action-btn:disabled { border-color: #333; color: #444; opacity: 0.5; cursor: not-allowed; }
+        button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 60px; flex: none; }
+        button.btn-clear:hover { background: #551111; color: #fff; }
+        .grid-container { width: 100%; max-width: 600px; display: flex; justify-content: center; margin: 30px auto 0; perspective: 1000px; min-height: 100px; }
+        
+        /* Grids Dinâmicos */
+        .grid { display: grid; gap: 12px; width: 100%; justify-content: center; }
+        .grid.single { grid-template-columns: 1fr; max-width: 120px; }
+        .grid.three { grid-template-columns: repeat(3, 1fr); max-width: 350px; }
+        .grid.nine { grid-template-columns: repeat(3, 1fr); max-width: 350px; }
+        .grid.mesa-real { grid-template-columns: repeat(6, 1fr); max-width: 100%; gap: 6px; }
+
+        .card {
+            width: 100%; aspect-ratio: 2.5/3.5; background: var(--card-bg); border: 1px solid #333;
+            border-radius: 8px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; position: relative; transition: transform 0.6s; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .card.flipped { border-color: var(--gold); background: #1e1e1e; transform: translateY(-5px); }
+        .card-inner { font-size: 2.4rem; line-height: 1; margin-bottom: 5px; }
+        .card-name {
+            font-size: 0.75rem; color: var(--gold); text-transform: uppercase; text-align: center;
+            line-height: 1.1; opacity: 0; transition: opacity 0.4s; font-weight: 700; letter-spacing: 0.5px;
+        }
+        .card.flipped .card-name { opacity: 1; }
+        .card-back {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
+            border-radius: 8px; z-index: 2;
+        }
+        .card.flipped .card-back { display: none; }
+        
+        .report {
+            max-width: 600px; width: 100%; background: #111; border-left: 4px solid var(--gold);
+            padding: 25px; margin-top: 30px; line-height: 1.8; white-space: pre-wrap;
+            display: none; font-size: 1rem; color: #ccc; border-radius: 0 12px 12px 0;
+        }
+        .report strong { color: var(--gold); }
+        
+        .loading { color: var(--gold); display: none; text-align: center; margin-top: 30px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; }
+        .loading span { animation: blink 1.4s infinite both; }
+        @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
     </style>
 </head>
 <body>
+    <h1>Lenormand AI</h1>
+    <div class="sub">Oráculo Digital</div>
 
-<div class="container">
-    <h1>🔮 Lenormand AI</h1>
-    
-    <div class="form-group">
-        <label>Data de Nascimento</label>
-        <input type="date" id="dataNasc" required>
+    <div class="main-container" id="input-section">
+        <div>
+            <label class="section-label">Consultante</label>
+            <input type="text" id="consulente-nome" placeholder="Nome completo">
+        </div>
+        <div class="info-grid">
+            <div>
+                <label class="section-label">Data de Nascimento</label>
+                <input type="date" id="consulente-nasc">
+            </div>
+            <div>
+                <label class="section-label">Gênero</label>
+                <div class="gender-select">
+                    <button class="gender-opt active" onclick="setGender('Homem')">Masc</button>
+                    <button class="gender-opt" onclick="setGender('Mulher')">Fem</button>
+                    <button class="gender-opt" onclick="setGender('Outro')">Outro</button>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="section-label">Tipo de Tiragem</label>
+            <div class="qty-select">
+                <button class="qty-btn selected" onclick="selectQty(1, this)">1 Carta</button>
+                <button class="qty-btn" onclick="selectQty(3, this)">3 Cartas</button>
+                <button class="qty-btn" onclick="selectQty(9, this)">9 Cartas</button>
+                <button class="qty-btn" onclick="selectQty(36, this)">Mesa Real</button>
+            </div>
+        </div>
+
+        <div>
+            <label class="section-label">Pergunta (Opcional)</label>
+            <textarea id="question" placeholder="Deixe em branco para leitura geral da vida..."></textarea>
+        </div>
+
+        <div class="action-group">
+            <button class="action-btn" id="btn-deal" onclick="startReading()">🔮 Embaralhar & Abrir</button>
+            <button class="action-btn" id="btn-read" onclick="read()" disabled style="display:none;">✨ Interpretar</button>
+            <button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label>Tipo de Leitura</label>
-        <select id="tipoLeitura">
-            <option value="dia">Leitura do Dia (1 Carta)</option>
-            <option value="semana">Leitura da Semana (3 Cartas)</option>
-            <option value="mesa_real">Mesa Real (10 Cartas)</option>
-            <option value="mes">Mesa do Mês (9 Cartas)</option>
-        </select>
+    <div class="grid-container">
+        <div class="grid" id="table"></div>
     </div>
 
-    <button onclick="fazerLeitura()">Consultar as Cartas</button>
+    <div id="loading" class="loading">Consultando as Cartas<span>.</span><span>.</span><span>.</span></div>
+    <div id="report" class="report"></div>
 
-    <div class="loading" id="loading">Consultando a IA...</div>
+    <script>
+        // --- CONFIGURAÇÃO ---
+        const _k = "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"; 
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        const MODEL = "llama-3.1-8b-instant";
 
-    <div class="result" id="resultado" style="display: none;">
-        <h3>Cartas Sorteadas:</h3>
-        <div class="cards-grid" id="cardsArea"></div>
-        
-        <h3>Interpretação da IA:</h3>
-        <div class="interpretation" id="textoIA"></div>
-    </div>
-</div>
+        // --- ESTADO ---
+        const deck = [
+            { n:1, name: "Cavaleiro", i: "🏇" }, { n:2, name: "Trevo", i: "☘️" }, { n:3, name: "Navio", i: "⛵" },
+            { n:4, name: "Casa", i: "🏠" }, { n:5, name: "Árvore", i: "🌳" }, { n:6, name: "Nuvens", i: "☁️" },
+            { n:7, name: "Cobra", i: "🐍" }, { n:8, name: "Caixão", i: "⚰️" }, { n:9, name: "Buquê", i: "💐" },
+            { n:10, name: "Foice", i: "🌾" }, { n:11, name: "Chicote", i: "🎢" }, { n:12, name: "Pássaros", i: "🐦" },
+            { n:13, name: "Criança", i: "👶" }, { n:14, name: "Raposa", i: "🦊" }, { n:15, name: "Urso", i: "🐻" },
+            { n:16, name: "Estrelas", i: "🌟" }, { n:17, name: "Cegonha", i: "🦢" }, { n:18, name: "Cão", i: "🐕" },
+            { n:19, name: "Torre", i: "🏰" }, { n:20, name: "Jardim", i: "🌳" }, { n:21, name: "Montanha", i: "⛰️" },
+            { n:22, name: "Caminho", i: "🛤️" }, { n:23, name: "Ratos", i: "🐀" }, { n:24, name: "Coração", i: "❤️" },
+            { n:25, name: "Anel", i: "💍" }, { n:26, name: "Livro", i: "📖" }, { n:27, name: "Carta", i: "✉️" },
+            { n:28, name: "Homem", i: "👨" }, { n:29, name: "Mulher", i: "👩" }, { n:30, name: "Lírios", i: "⚜️" },
+            { n:31, name: "Sol", i: "☀️" }, { n:32, name: "Lua", i: "🌙" }, { n:33, name: "Chave", i: "🗝️" },
+            { n:34, name: "Peixes", i: "🐟" }, { n:35, name: "Âncora", i: "⚓" }, { n:36, name: "Cruz", i: "✝️" }
+        ];
 
-<script>
-    async function fazerLeitura() {
-        const dataInput = document.getElementById('dataNasc').value;
-        const tipo = document.getElementById('tipoLeitura').value;
-        
-        if (!dataInput) {
-            alert("Por favor, selecione sua data de nascimento.");
-            return;
+        let state = {
+            gender: 'Homem',
+            targetQty: 1,
+            currentCards: []
+        };
+
+        let consulenteData = { nome: '', nasc: '' };
+
+        // --- LÓGICA ---
+        function setGender(g) {
+            state.gender = g;
+            document.querySelectorAll('.gender-opt').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.trim() === (g === 'Homem' ? 'Masc' : g === 'Mulher' ? 'Fem' : 'Outro'));
+            });
         }
 
-        const [ano, mes, dia] = dataInput.split('-');
-        const payload = { dia_nasc: parseInt(dia), mes_nasc: parseInt(mes), ano_nasc: parseInt(ano), tipo: tipo };
+        function selectQty(qty, btn) {
+            state.targetQty = qty;
+            document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
 
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('resultado').style.display = 'none';
+        function resetGame() {
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            table.className = 'grid';
+            document.getElementById('report').style.display = 'none';
+            document.getElementById('btn-read').disabled = true;
+            document.getElementById('btn-read').style.display = 'none';
+            document.getElementById('btn-close').disabled = true;
+            
+            const btnDeal = document.getElementById('btn-deal');
+            btnDeal.disabled = false;
+            btnDeal.textContent = "🔮 Embaralhar & Abrir";
+            btnDeal.style.display = 'block';
+            
+            document.getElementById('consulente-nome').disabled = false;
+            document.getElementById('consulente-nasc').disabled = false;
+            document.getElementById('question').disabled = false;
+            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
+        }
 
-        try {
-            const response = await fetch('http://127.0.0.1:8000/ler', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+        function startReading() {
+            const nome = document.getElementById('consulente-nome').value.trim();
+            
+            if (!nome) {
+                alert("Por favor, digite o nome do consulente.");
+                return;
+            }
+
+            consulenteData.nome = nome;
+            consulenteData.nasc = document.getElementById('consulente-nasc').value || "não informada";
+
+            document.getElementById('consulente-nome').disabled = true;
+            document.getElementById('consulente-nasc').disabled = true;
+            document.getElementById('question').disabled = true;
+            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
+
+            const btnDeal = document.getElementById('btn-deal');
+            btnDeal.textContent = "🔮 Embaralhando...";
+            btnDeal.disabled = true;
+
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            state.currentCards = [];
+
+            table.className = 'grid';
+            
+            let cardsToDraw = state.targetQty;
+            if (state.targetQty === 36) {
+                table.classList.add('mesa-real');
+                cardsToDraw = 36;
+            } else if (state.targetQty === 9) {
+                table.classList.add('nine');
+            } else if (state.targetQty === 3) {
+                table.classList.add('three');
+            } else {
+                table.classList.add('single');
+            }
+
+            state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, cardsToDraw);
+
+            state.currentCards.forEach((c, i) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.innerHTML = `
+                    <div class="card-back"></div>
+                    <div class="card-content" style="opacity:0">
+                        <div class="card-inner">${c.i}</div>
+                        <div class="card-name">${c.n} ${c.name}</div>
+                    </div>
+                `;
+                table.appendChild(cardEl);
+                setTimeout(() => {
+                    cardEl.classList.add('flipped');
+                    cardEl.querySelector('.card-content').style.opacity = '1';
+                }, 300 + (i * 100));
             });
 
-            const data = await response.json();
-            
-            // Renderiza Cartas
-            const cardsArea = document.getElementById('cardsArea');
-            cardsArea.innerHTML = data.cartas.map(c => `<div class="card">${c}</div>`).join('');
-            
-            // Renderiza Texto da IA
-            document.getElementById('textoIA').innerText = data.interpretacao_ia;
-            
-            document.getElementById('resultado').style.display = 'block';
-        } catch (error) {
-            alert("Erro ao conectar com a API. Verifique se o servidor está rodando.");
-            console.error(error);
-        } finally {
-            document.getElementById('loading').style.display = 'none';
+            setTimeout(() => {
+                btnDeal.style.display = 'none';
+                document.getElementById('btn-read').style.display = 'block';
+                document.getElementById('btn-read').disabled = false;
+                document.getElementById('btn-close').disabled = false;
+                document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, (state.currentCards.length * 100) + 800);
         }
-    }
-</script>
 
+        async function read() {
+            const q = document.getElementById('question').value.trim();
+            const loading = document.getElementById('loading');
+            const report = document.getElementById('report');
+            
+            loading.style.display = 'block';
+            report.style.display = 'none';
+
+            const cardList = state.currentCards.map(c => `${c.n}. ${c.name} (${c.i})`).join(', ');
+            
+            let systemPrompt = "Atue como um especialista sênior em Baralho Lenormand. Seja direto, prático e evitando misticismo vago. Foque em ações e conselhos concretos.";
+            
+            let userPrompt = `Consultante: ${consulenteData.nome}, Gênero: ${state.gender}, Nascimento: ${consulenteData.nasc}.`;
+            userPrompt += `\nTipo de Tiragem: ${state.targetQty} Carta(s).`;
+            userPrompt += `\nCartas tiradas: ${cardList}.`;
+
+            // Lógica Condicional: Pergunta vs Geral
+            if (!q) {
+                userPrompt += `\nModo: LEITURA GERAL DE VIDA. O campo de pergunta está vazio.`;
+                userPrompt += `\nInstrução: Analise a situação atual do consulente de forma holística, sem foco em um tópico específico.`;
+            } else {
+                userPrompt += `\nModo: RESPOSTA ESPECÍFICA.`;
+                userPrompt += `\nPergunta do Usuário: "${q}"`;
+                userPrompt += `\nInstrução: Use a pergunta como âncora interpretativa. Filtre a leitura das cartas para responder diretamente a essa questão.`;
+            }
+
+            // Instrução de Formatação FIXA com lógica condicional para os conselhos
+            userPrompt += `\n\nFORMATO DE SAÍDA OBRIGATÓRIO:`;
+            userPrompt += `\n1. Interpretação Narrativa: Analise as cartas combinadas com base no modo definido acima.`;
+            userPrompt += `\n2. Ao final, inclua EXATAMENTE estes dois tópicos destacados:`;
+            
+            if (q) {
+                userPrompt += `\n   - **Conselho para o Dia**: Uma ação prática IMEDIATA relacionada especificamente à pergunta "${q}".`;
+                userPrompt += `\n   - **Conselho para a Semana**: Como a situação da pergunta "${q}" deve evoluir nos próximos 7 dias.`;
+            } else {
+                userPrompt += `\n   - **Conselho para o Dia**: Uma ação prática e imediata baseada na energia dominante geral.`;
+                userPrompt += `\n   - **Conselho para a Semana**: Uma projeção de como essa energia afetará a vida do consulente nos próximos 7 dias.`;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${_k}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: userPrompt }
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 1500
+                    })
+                });
+
+                if (!response.ok) throw new Error('Falha na conexão com o Oráculo');
+                
+                const data = await response.json();
+                const text = data.choices[0].message.content;
+                
+                report.textContent = text;
+                report.style.display = 'block';
+                loading.style.display = 'none';
+
+            } catch (err) {
+                loading.style.display = 'none';
+                alert("Erro: " + err.message);
+            }
+        }
+    </script>
 </body>
 </html>
