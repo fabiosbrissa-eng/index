@@ -4,111 +4,414 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0a0a">
-    <title>LENORMAND AI</title>
+    <title>LENORMAND AI - Oracle</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --gold: #d4af37;
-            --bg: #0a0a0a;
-            --card-bg: #141414;
-            --input-bg: #1a1a1a;
-            --border: #2a2a2a;
+            --gold-light: #f3e5ab;
+            --gold-dark: #8a7020;
+            --bg: #050505;
+            --card-bg: #121212;
+            --input-bg: rgba(255, 255, 255, 0.03);
+            --border: #333;
             --text: #e0e0e0;
-            --error: #ff4d4d;
+            --text-muted: #888;
         }
+        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
+            font-family: 'Lora', serif;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
             color: var(--text);
             margin: 0;
-            padding: 20px 15px 40px 15px;
+            padding: 40px 20px 60px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
+
         h1 {
+            font-family: 'Cinzel', serif;
             color: var(--gold);
             margin: 0 0 5px 0;
-            font-size: 1.8rem;
+            font-size: 2.4rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 6px;
             text-align: center;
-            font-weight: 300;
+            font-weight: 400;
+            text-shadow: 0 2px 15px rgba(212, 175, 55, 0.2);
         }
-        .sub { color: #666; font-size: 0.7rem; margin-bottom: 25px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
-        .main-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
-        .section-label { color: #8a7020; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; display: block; }
+        
+        .sub { 
+            color: var(--text-muted); 
+            font-size: 0.7rem; 
+            margin-bottom: 45px; 
+            text-align: center; 
+            text-transform: uppercase; 
+            letter-spacing: 4px; 
+            font-family: 'Cinzel', serif;
+            opacity: 0.8;
+        }
+
+        .main-container { 
+            width: 100%; 
+            max-width: 550px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 25px; 
+            margin-bottom: 20px;
+        }
+
+        .section-label { 
+            color: var(--gold); 
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem; 
+            margin-bottom: 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            display: block; 
+        }
+
         input, textarea, select {
             width: 100%;
             background: var(--input-bg);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 14px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 15px;
+            padding: 18px;
+            border-radius: 2px;
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
         }
-        input:focus, textarea:focus { border-color: var(--gold); }
-        textarea { height: 80px; resize: none; margin-top: 5px; }
-        input::placeholder { color: #444; }
-        .info-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; align-items: start; }
-        .gender-select { display: flex; background: var(--input-bg); border-radius: 10px; padding: 2px; border: 1px solid var(--border); height: 52px; }
-        .gender-opt { flex: 1; background: transparent; border: none; color: #666; cursor: pointer; border-radius: 8px; transition: 0.3s; font-weight: 500; font-size: 0.8rem; }
-        .gender-opt.active { background: var(--gold); color: #000; font-weight: 700; }
-        .qty-select { display: flex; flex-wrap: wrap; gap: 8px; background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
-        .qty-btn {
-            flex: 1; min-width: 80px; background: #222; border: 1px solid #333; color: #666;
-            padding: 12px 5px; font-size: 0.8rem; cursor: pointer; border-radius: 8px; font-weight: 600; transition: 0.2s; text-align: center;
+
+        input:focus, textarea:focus, select:focus { 
+            border-color: var(--gold); 
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.05);
         }
-        .qty-btn:hover { border-color: var(--gold); color: var(--text); }
-        .qty-btn.selected { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
-        .action-group { display: flex; gap: 12px; margin-top: 10px; }
-        button.action-btn {
-            background: #111; border: 1px solid var(--gold); color: var(--gold);
-            padding: 16px; cursor: pointer; text-transform: uppercase; font-weight: 700;
-            border-radius: 10px; transition: 0.3s; flex: 1; font-size: 0.85rem; letter-spacing: 1px;
+
+        textarea { height: 100px; resize: none; margin-top: 5px; line-height: 1.6; }
+        input::placeholder, textarea::placeholder { color: #444; font-style: italic; }
+
+        .info-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px; align-items: start; }
+
+        .gender-select { 
+            display: flex; 
+            background: var(--input-bg); 
+            border-radius: 2px; 
+            padding: 2px; 
+            border: 1px solid var(--border); 
+            height: 56px; 
         }
-        button.action-btn:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
-        button.action-btn:disabled { border-color: #333; color: #444; opacity: 0.5; cursor: not-allowed; }
-        button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 60px; flex: none; }
-        button.btn-clear:hover { background: #551111; color: #fff; }
-        .grid-container { width: 100%; max-width: 600px; display: flex; justify-content: center; margin: 30px auto 0; perspective: 1000px; min-height: 100px; }
         
-        /* Grids Dinâmicos */
-        .grid { display: grid; gap: 12px; width: 100%; justify-content: center; }
-        .grid.single { grid-template-columns: 1fr; max-width: 120px; }
-        .grid.three { grid-template-columns: repeat(3, 1fr); max-width: 350px; }
-        .grid.nine { grid-template-columns: repeat(3, 1fr); max-width: 350px; }
-        .grid.mesa-real { grid-template-columns: repeat(6, 1fr); max-width: 100%; gap: 6px; }
+        .gender-opt { 
+            flex: 1; 
+            background: transparent; 
+            border: none; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            border-radius: 2px; 
+            transition: 0.3s; 
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem; 
+            letter-spacing: 1px;
+        }
+        
+        .gender-opt.active { 
+            background: var(--gold); 
+            color: #000; 
+            font-weight: 700; 
+        }
+
+        .qty-select { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+            background: transparent;
+        }
+        
+        .qty-btn {
+            flex: 1; 
+            min-width: 90px; 
+            background: #111; 
+            border: 1px solid #333; 
+            color: var(--text-muted);
+            padding: 14px 5px; 
+            font-size: 0.7rem; 
+            cursor: pointer; 
+            border-radius: 2px; 
+            font-family: 'Cinzel', serif;
+            transition: 0.3s; 
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .qty-btn:hover { border-color: var(--gold); color: var(--text); }
+        .qty-btn.selected { 
+            background: linear-gradient(135deg, var(--gold), #b8962e); 
+            color: #000; 
+            border-color: var(--gold); 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); 
+            font-weight: 700;
+        }
+
+        /* --- BOTÕES DE AÇÃO --- */
+        .action-group { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 25px; 
+            align-items: center;
+        }
+        
+        button.action-btn {
+            background: linear-gradient(to bottom, #1a1a1a, #0a0a0a);
+            border: 1px solid var(--gold); 
+            color: var(--gold);
+            padding: 18px 25px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            font-weight: 700;
+            border-radius: 2px; 
+            transition: 0.3s; 
+            flex: 1; 
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem; 
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        button.action-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
+            transition: 0.6s;
+        }
+
+        button.action-btn:hover:not(:disabled)::before { left: 100%; }
+        
+        button.action-btn:hover:not(:disabled) { 
+            background: var(--gold); 
+            color: #000; 
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3); 
+            transform: translateY(-2px);
+            border-color: var(--gold-light);
+        }
+        
+        button.action-btn:disabled { 
+            border-color: #222; 
+            color: #333; 
+            cursor: not-allowed; 
+            background: #080808; 
+            box-shadow: none;
+        }
+
+        /* Botão Limpar Minimalista */
+        button.btn-clear { 
+            background: transparent;
+            border: 1px solid transparent;
+            color: #555; 
+            width: 45px; 
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            flex: none; 
+            border-radius: 50%;
+            transition: 0.3s;
+            font-size: 1.2rem;
+        }
+
+        button.btn-clear:hover:not(:disabled) { 
+            background: rgba(255, 0, 0, 0.1); 
+            color: #ff4444; 
+            border-color: rgba(255, 0, 0, 0.3);
+            transform: rotate(90deg);
+        }
+
+        /* --- CARTAS (SISTEMA 3D) --- */
+        .grid-container { 
+            width: 100%; 
+            max-width: 800px; 
+            display: flex; 
+            justify-content: center; 
+            margin: 50px auto 0; 
+            perspective: 1500px; 
+            min-height: 150px; 
+        }
+        
+        .grid { display: grid; gap: 20px; width: 100%; justify-content: center; }
+        .grid.single { grid-template-columns: 1fr; max-width: 160px; }
+        .grid.three { grid-template-columns: repeat(3, 1fr); max-width: 500px; }
+        .grid.nine { grid-template-columns: repeat(3, 1fr); max-width: 500px; }
+        .grid.mesa-real { grid-template-columns: repeat(6, 1fr); max-width: 100%; gap: 12px; }
 
         .card {
-            width: 100%; aspect-ratio: 2.5/3.5; background: var(--card-bg); border: 1px solid #333;
-            border-radius: 8px; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; position: relative; transition: transform 0.6s; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            width: 100%; 
+            aspect-ratio: 2.4/3.5; 
+            position: relative; 
+            transform-style: preserve-3d; 
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: default;
+            opacity: 0;
+            /* Removido animation padrão para controlar via JS */
         }
-        .card.flipped { border-color: var(--gold); background: #1e1e1e; transform: translateY(-5px); }
-        .card-inner { font-size: 2.4rem; line-height: 1; margin-bottom: 5px; }
-        .card-name {
-            font-size: 0.75rem; color: var(--gold); text-transform: uppercase; text-align: center;
-            line-height: 1.1; opacity: 0; transition: opacity 0.4s; font-weight: 700; letter-spacing: 0.5px;
+
+        /* Quando virada, gira 180 graus */
+        .card.flipped {
+            transform: rotateY(180deg);
         }
-        .card.flipped .card-name { opacity: 1; }
+
+        /* Frente e Verso comuns */
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* VERSO DA CARTA */
         .card-back {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
-            border-radius: 8px; z-index: 2;
+            background-color: #151515;
+            background-image: 
+                repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.05) 0, rgba(212, 175, 55, 0.05) 1px, transparent 1px, transparent 10px),
+                repeating-linear-gradient(-45deg, rgba(212, 175, 55, 0.05) 0, rgba(212, 175, 55, 0.05) 1px, transparent 1px, transparent 10px);
+            border: 1px solid #333;
+            box-shadow: inset 0 0 0 2px #111, inset 0 0 0 3px #222;
+            transform: rotateY(0deg);
+            z-index: 2;
         }
-        .card.flipped .card-back { display: none; }
         
+        .card-back::after {
+            content: '✦';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--gold-dark);
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        /* FRENTE DA CARTA */
+        .card-front {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border: 1px solid var(--gold-dark);
+            transform: rotateY(180deg);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            z-index: 1;
+        }
+
+        .card:hover {
+            z-index: 10;
+        }
+
+        /* Ícone Estilizado */
+        .card-symbol {
+            width: 60px;
+            height: 60px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: rgba(212, 175, 55, 0.05);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+        }
+        
+        .card-name {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem; 
+            color: var(--gold-light); 
+            text-transform: uppercase; 
+            text-align: center;
+            line-height: 1.3; 
+            letter-spacing: 2px;
+            padding: 0 10px;
+            font-weight: 700;
+        }
+        
+        /* --- RELATÓRIO --- */
         .report {
-            max-width: 600px; width: 100%; background: #111; border-left: 4px solid var(--gold);
-            padding: 25px; margin-top: 30px; line-height: 1.8; white-space: pre-wrap;
-            display: none; font-size: 1rem; color: #ccc; border-radius: 0 12px 12px 0;
+            max-width: 700px; 
+            width: 100%; 
+            background: linear-gradient(180deg, #111 0%, #0a0a0a 100%);
+            border: 1px solid #222;
+            border-top: 4px solid var(--gold);
+            padding: 50px; 
+            margin-top: 50px; 
+            line-height: 1.9; 
+            white-space: pre-wrap;
+            display: none; 
+            font-size: 1.1rem; 
+            color: #ccc; 
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            position: relative;
+            animation: slideUp 0.8s ease-out;
         }
-        .report strong { color: var(--gold); }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .report h3 { 
+            font-family: 'Cinzel', serif;
+            color: var(--gold); 
+            margin-top: 35px; 
+            margin-bottom: 20px; 
+            font-size: 1.3rem; 
+            text-transform: uppercase; 
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+            letter-spacing: 2px;
+        }
         
-        .loading { color: var(--gold); display: none; text-align: center; margin-top: 30px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; }
+        .report strong { color: #fff; font-weight: 600; }
+
+        .advice-box {
+            background: rgba(212, 175, 55, 0.03);
+            border-left: 3px solid var(--gold);
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 2px 2px 0;
+            font-style: italic;
+        }
+
+        .loading { 
+            color: var(--gold); 
+            display: none; 
+            text-align: center; 
+            margin-top: 50px; 
+            font-family: 'Cinzel', serif;
+            font-size: 1rem; 
+            text-transform: uppercase; 
+            letter-spacing: 5px; 
+            font-weight: 400; 
+        }
+        
         .loading span { animation: blink 1.4s infinite both; }
         @keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
     </style>
@@ -155,7 +458,8 @@
         <div class="action-group">
             <button class="action-btn" id="btn-deal" onclick="startReading()">🔮 Embaralhar & Abrir</button>
             <button class="action-btn" id="btn-read" onclick="read()" disabled style="display:none;">✨ Interpretar</button>
-            <button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
+            
+            <button class="btn-clear" id="btn-close" onclick="resetGame()" disabled title="Limpar Mesa">✖</button>
         </div>
     </div>
 
@@ -167,26 +471,30 @@
     <div id="report" class="report"></div>
 
     <script>
-        // --- CONFIGURAÇÃO ---
+        // --- CONFIGURAÇÃO DA API ---
         const _k = "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"; 
+        
         const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
         const MODEL = "llama-3.1-8b-instant";
 
-        // --- ESTADO ---
-        const deck = [
-            { n:1, name: "Cavaleiro", i: "🏇" }, { n:2, name: "Trevo", i: "☘️" }, { n:3, name: "Navio", i: "⛵" },
-            { n:4, name: "Casa", i: "🏠" }, { n:5, name: "Árvore", i: "🌳" }, { n:6, name: "Nuvens", i: "☁️" },
-            { n:7, name: "Cobra", i: "🐍" }, { n:8, name: "Caixão", i: "⚰️" }, { n:9, name: "Buquê", i: "💐" },
-            { n:10, name: "Foice", i: "🌾" }, { n:11, name: "Chicote", i: "🎢" }, { n:12, name: "Pássaros", i: "🐦" },
-            { n:13, name: "Criança", i: "👶" }, { n:14, name: "Raposa", i: "🦊" }, { n:15, name: "Urso", i: "🐻" },
-            { n:16, name: "Estrelas", i: "🌟" }, { n:17, name: "Cegonha", i: "🦢" }, { n:18, name: "Cão", i: "🐕" },
-            { n:19, name: "Torre", i: "🏰" }, { n:20, name: "Jardim", i: "🌳" }, { n:21, name: "Montanha", i: "⛰️" },
-            { n:22, name: "Caminho", i: "🛤️" }, { n:23, name: "Ratos", i: "🐀" }, { n:24, name: "Coração", i: "❤️" },
-            { n:25, name: "Anel", i: "💍" }, { n:26, name: "Livro", i: "📖" }, { n:27, name: "Carta", i: "✉️" },
-            { n:28, name: "Homem", i: "👨" }, { n:29, name: "Mulher", i: "👩" }, { n:30, name: "Lírios", i: "⚜️" },
-            { n:31, name: "Sol", i: "☀️" }, { n:32, name: "Lua", i: "🌙" }, { n:33, name: "Chave", i: "🗝️" },
-            { n:34, name: "Peixes", i: "🐟" }, { n:35, name: "Âncora", i: "⚓" }, { n:36, name: "Cruz", i: "✝️" }
+        const deckNames = [
+            "Cavaleiro", "Trevo", "Navio", "Casa", "Árvore", "Nuvens", "Cobra", "Caixão", "Buquê", 
+            "Foice", "Chicote", "Pássaros", "Criança", "Raposa", "Urso", "Estrelas", "Cegonha", "Cão", 
+            "Torre", "Jardim", "Montanha", "Caminho", "Ratos", "Coração", "Anel", "Livro", "Carta", 
+            "Homem", "Mulher", "Lírios", "Sol", "Lua", "Chave", "Peixes", "Âncora", "Cruz"
         ];
+        
+        const cardSymbols = {
+            "Cavaleiro": "♞", "Trevo": "☘", "Navio": "⚓", "Casa": "⌂", "Árvore": "♠", 
+            "Nuvens": "☁", "Cobra": "∿", "Caixão": "⚰", "Buquê": "✿", "Foice": "⚔", 
+            "Chicote": "↯", "Pássaros": "♫", "Criança": "♟", "Raposa": "Fox", "Urso": "Bear", 
+            "Estrelas": "★", "Cegonha": "Stork", "Cão": "Dog", "Torre": "♖", "Jardim": "Flower", 
+            "Montanha": "▲", "Caminho": "Path", "Ratos": "Mouse", "Coração": "♥", "Anel": "○", 
+            "Livro": "Book", "Carta": "✉", "Homem": "♂", "Mulher": "♀", "Lírios": "⚜", 
+            "Sol": "☀", "Lua": "☾", "Chave": "Key", "Peixes": "Fish", "Âncora": "⚓", "Cruz": "✝"
+        };
+
+        const deck = deckNames.map((name, index) => ({ n: index + 1, name: name }));
 
         let state = {
             gender: 'Homem',
@@ -196,7 +504,6 @@
 
         let consulenteData = { nome: '', nasc: '' };
 
-        // --- LÓGICA ---
         function setGender(g) {
             state.gender = g;
             document.querySelectorAll('.gender-opt').forEach(btn => {
@@ -212,22 +519,31 @@
 
         function resetGame() {
             const table = document.getElementById('table');
-            table.innerHTML = '';
-            table.className = 'grid';
-            document.getElementById('report').style.display = 'none';
-            document.getElementById('btn-read').disabled = true;
-            document.getElementById('btn-read').style.display = 'none';
-            document.getElementById('btn-close').disabled = true;
+            const cards = document.querySelectorAll('.card');
             
-            const btnDeal = document.getElementById('btn-deal');
-            btnDeal.disabled = false;
-            btnDeal.textContent = "🔮 Embaralhar & Abrir";
-            btnDeal.style.display = 'block';
-            
-            document.getElementById('consulente-nome').disabled = false;
-            document.getElementById('consulente-nasc').disabled = false;
-            document.getElementById('question').disabled = false;
-            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
+            cards.forEach(c => {
+                c.style.opacity = '0';
+                c.style.transform = 'scale(0.8)';
+            });
+
+            setTimeout(() => {
+                table.innerHTML = '';
+                table.className = 'grid';
+                document.getElementById('report').style.display = 'none';
+                document.getElementById('btn-read').disabled = true;
+                document.getElementById('btn-read').style.display = 'none';
+                document.getElementById('btn-close').disabled = true;
+                
+                const btnDeal = document.getElementById('btn-deal');
+                btnDeal.disabled = false;
+                btnDeal.textContent = "🔮 Embaralhar & Abrir";
+                btnDeal.style.display = 'block';
+                
+                document.getElementById('consulente-nome').disabled = false;
+                document.getElementById('consulente-nasc').disabled = false;
+                document.getElementById('question').disabled = false;
+                document.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
+            }, 300);
         }
 
         function startReading() {
@@ -257,46 +573,65 @@
             table.className = 'grid';
             
             let cardsToDraw = state.targetQty;
-            if (state.targetQty === 36) {
-                table.classList.add('mesa-real');
-                cardsToDraw = 36;
-            } else if (state.targetQty === 9) {
-                table.classList.add('nine');
-            } else if (state.targetQty === 3) {
-                table.classList.add('three');
-            } else {
-                table.classList.add('single');
-            }
+            if (state.targetQty === 36) table.classList.add('mesa-real');
+            else if (state.targetQty === 9) table.classList.add('nine');
+            else if (state.targetQty === 3) table.classList.add('three');
+            else table.classList.add('single');
 
-            state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, cardsToDraw);
+            // Embaralhar
+            const shuffled = [...deck];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            state.currentCards = shuffled.slice(0, cardsToDraw);
 
             state.currentCards.forEach((c, i) => {
                 const cardEl = document.createElement('div');
                 cardEl.className = 'card';
+                cardEl.style.opacity = '0'; 
+                
+                const symbol = cardSymbols[c.name] || "?";
+                
                 cardEl.innerHTML = `
-                    <div class="card-back"></div>
-                    <div class="card-content" style="opacity:0">
-                        <div class="card-inner">${c.i}</div>
-                        <div class="card-name">${c.n} ${c.name}</div>
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front">
+                        <div class="card-symbol">${symbol}</div>
+                        <div class="card-name">${c.name}</div>
                     </div>
                 `;
                 table.appendChild(cardEl);
+                
+                // Sequência: Aparecer -> Esperar -> Virar
                 setTimeout(() => {
-                    cardEl.classList.add('flipped');
-                    cardEl.querySelector('.card-content').style.opacity = '1';
-                }, 300 + (i * 100));
+                    cardEl.style.opacity = '1';
+                    setTimeout(() => {
+                        cardEl.classList.add('flipped');
+                    }, 300); 
+                }, 100 + (i * 150)); 
             });
+
+            // Liberar controles após animação completa
+            const totalAnimationTime = 100 + (state.currentCards.length * 150) + 300 + 800; 
 
             setTimeout(() => {
                 btnDeal.style.display = 'none';
                 document.getElementById('btn-read').style.display = 'block';
                 document.getElementById('btn-read').disabled = false;
                 document.getElementById('btn-close').disabled = false;
-                document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, (state.currentCards.length * 100) + 800);
+                
+                setTimeout(() => {
+                    document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }, totalAnimationTime);
         }
 
         async function read() {
+            if (!_k || _k.trim() === "") {
+                alert("ERRO: Chave de API ausente.");
+                return;
+            }
+
             const q = document.getElementById('question').value.trim();
             const loading = document.getElementById('loading');
             const report = document.getElementById('report');
@@ -304,7 +639,7 @@
             loading.style.display = 'block';
             report.style.display = 'none';
 
-            const cardList = state.currentCards.map(c => `${c.n}. ${c.name} (${c.i})`).join(', ');
+            const cardList = state.currentCards.map(c => `${c.n}. ${c.name}`).join(', ');
             
             let systemPrompt = "Atue como um especialista sênior em Baralho Lenormand. Seja direto, prático e evitando misticismo vago. Foque em ações e conselhos concretos.";
             
@@ -312,27 +647,27 @@
             userPrompt += `\nTipo de Tiragem: ${state.targetQty} Carta(s).`;
             userPrompt += `\nCartas tiradas: ${cardList}.`;
 
-            // Lógica Condicional: Pergunta vs Geral
             if (!q) {
-                userPrompt += `\nModo: LEITURA GERAL DE VIDA. O campo de pergunta está vazio.`;
-                userPrompt += `\nInstrução: Analise a situação atual do consulente de forma holística, sem foco em um tópico específico.`;
+                userPrompt += `\nModo: LEITURA GERAL DE VIDA.`;
+                userPrompt += `\nInstrução: Analise a situação atual do consulente de forma holística.`;
             } else {
                 userPrompt += `\nModo: RESPOSTA ESPECÍFICA.`;
                 userPrompt += `\nPergunta do Usuário: "${q}"`;
-                userPrompt += `\nInstrução: Use a pergunta como âncora interpretativa. Filtre a leitura das cartas para responder diretamente a essa questão.`;
+                userPrompt += `\nInstrução: Use a pergunta como âncora interpretativa.`;
             }
 
-            // Instrução de Formatação FIXA com lógica condicional para os conselhos
             userPrompt += `\n\nFORMATO DE SAÍDA OBRIGATÓRIO:`;
-            userPrompt += `\n1. Interpretação Narrativa: Analise as cartas combinadas com base no modo definido acima.`;
-            userPrompt += `\n2. Ao final, inclua EXATAMENTE estes dois tópicos destacados:`;
             
             if (q) {
-                userPrompt += `\n   - **Conselho para o Dia**: Uma ação prática IMEDIATA relacionada especificamente à pergunta "${q}".`;
-                userPrompt += `\n   - **Conselho para a Semana**: Como a situação da pergunta "${q}" deve evoluir nos próximos 7 dias.`;
+                userPrompt += `\n1. Interpretação Narrativa: Responda à pergunta "${q}" usando as cartas.`;
+                userPrompt += `\n2. Ao final, inclua EXATAMENTE estes dois blocos HTML:`;
+                userPrompt += `\n   <div class="advice-box"><strong>💡 Conselho para o Dia</strong><br>Uma ação prática IMEDIATA relacionada à pergunta.</div>`;
+                userPrompt += `\n   <div class="advice-box"><strong>🔮 Conselho para a Semana</strong><br>Como a situação deve evoluir nos próximos 7 dias.</div>`;
             } else {
-                userPrompt += `\n   - **Conselho para o Dia**: Uma ação prática e imediata baseada na energia dominante geral.`;
-                userPrompt += `\n   - **Conselho para a Semana**: Uma projeção de como essa energia afetará a vida do consulente nos próximos 7 dias.`;
+                userPrompt += `\n1. Interpretação Narrativa: Analise a situação geral.`;
+                userPrompt += `\n2. Ao final, inclua EXATAMENTE estes dois blocos HTML:`;
+                userPrompt += `\n   <div class="advice-box"><strong>💡 Conselho para o Dia</strong><br>Uma ação prática imediata baseada na energia dominante.</div>`;
+                userPrompt += `\n   <div class="advice-box"><strong>🔮 Conselho para a Semana</strong><br>Projeção de como essa energia afetará a vida do consulente.</div>`;
             }
 
             try {
@@ -353,14 +688,24 @@
                     })
                 });
 
-                if (!response.ok) throw new Error('Falha na conexão com o Oráculo');
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || 'Falha na conexão');
+                }
                 
                 const data = await response.json();
-                const text = data.choices[0].message.content;
+                let text = data.choices[0].message.content;
                 
-                report.textContent = text;
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/\n/g, '<br>');
+                
+                report.innerHTML = text;
                 report.style.display = 'block';
                 loading.style.display = 'none';
+                
+                setTimeout(() => {
+                    report.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
 
             } catch (err) {
                 loading.style.display = 'none';
