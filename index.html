@@ -1,325 +1,744 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0a0a">
-<title>LENORMAND AI</title>
-<style>
-:root {
---gold: #d4af37;
---bg: #0a0a0a;
---card-bg: #141414;
---input-bg: #1a1a1a;
---border: #2a2a2a;
---text: #e0e0e0;
-}
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-body {
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-background: var(--bg);
-color: var(--text);
-margin: 0;
-padding: 20px 15px 40px 15px;
-display: flex;
-flex-direction: column;
-align-items: center;
-min-height: 100vh;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>LENORMAND AI - Secure</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --bg: #0a0a0a;
+            --card-bg: #141414;
+            --input-bg: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --error: #ff4d4d;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px 15px 40px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 {
+            color: var(--gold);
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            font-weight: 300;
+        }
+        .sub {
+            color: #666;
+            font-size: 0.7rem;
+            margin-bottom: 25px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-h1 { color: var(--gold); margin: 0 0 5px 0; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; text-align: center; font-weight: 300; }
-.sub { color: #666; font-size: 0.7rem; margin-bottom: 25px; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        /* Auth Styles */
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .auth-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #666;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .auth-tab.active {
+            color: var(--gold);
+            border-bottom: 2px solid var(--gold);
+        }
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .auth-form.active {
+            display: flex;
+        }
 
-.main-container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
-.section-label { color: #8a7020; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase; font-weight: 600; display: block; }
-
-input, textarea {
-width: 100%; background: var(--input-bg); border: 1px solid var(--border);
-color: var(--text); padding: 14px; border-radius: 10px; font-family: inherit; font-size: 15px;
-}
-input:focus, textarea:focus { border-color: var(--gold); }
-textarea { height: 80px; resize: none; margin-top: 5px; }
-input::placeholder { color: #444; }
-
-.info-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; align-items: start; }
-.gender-select { display: flex; background: var(--input-bg); border-radius: 10px; padding: 2px; border: 1px solid var(--border); height: 52px; }
-.gender-opt { flex: 1; background: transparent; border: none; color: #666; cursor: pointer; border-radius: 8px; transition: 0.3s; font-weight: 500; font-size: 0.8rem; }
-.gender-opt.active { background: var(--gold); color: #000; font-weight: 700; }
-
-.qty-select { display: flex; gap: 8px; background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
-.qty-btn { flex: 1; background: #222; border: 1px solid #333; color: #666; padding: 12px 5px; font-size: 0.8rem; cursor: pointer; border-radius: 8px; font-weight: 600; transition: 0.2s; text-align: center; }
-.qty-btn:hover { border-color: var(--gold); color: var(--text); }
-.qty-btn.selected { background: var(--gold); color: #000; border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
-
-.action-group { display: flex; gap: 12px; margin-top: 10px; }
-button.action-btn {
-background: #111; border: 1px solid var(--gold); color: var(--gold); padding: 16px; cursor: pointer;
-text-transform: uppercase; font-weight: 700; border-radius: 10px; transition: 0.3s; flex: 1; font-size: 0.85rem; letter-spacing: 1px;
-}
-button.action-btn:hover:not(:disabled) { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
-button.action-btn:disabled { border-color: #333; color: #444; opacity: 0.5; cursor: not-allowed; }
-button.btn-clear { border-color: #551111; color: #ff4d4d; max-width: 60px; flex: none; }
-button.btn-clear:hover { background: #551111; color: #fff; }
-
-.grid-container { width: 100%; max-width: 600px; display: flex; justify-content: center; margin: 30px auto 0; perspective: 1000px; min-height: 100px; }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 350px; }
-.grid.mesa-real { grid-template-columns: repeat(4, 1fr); max-width: 100%; gap: 6px; }
-
-.card {
-width: 100%; aspect-ratio: 2.5/3.5; background: var(--card-bg); border: 1px solid #333; border-radius: 8px;
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-position: relative; transition: transform 0.6s; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-}
-.mesa-real.card { aspect-ratio: 3/4; border-radius: 5px; }
-.mesa-real.card-inner { font-size: 1.6rem; }
-.mesa-real.card-name { font-size: 0.45rem; }
-
-.card.flipped { border-color: var(--gold); background: #1e1e1e; transform: translateY(-5px); }
-.card-inner { font-size: 2.4rem; line-height: 1; margin-bottom: 5px; }
-.card-name { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; text-align: center; line-height: 1.1; opacity: 0; transition: opacity 0.4s; font-weight: 700; letter-spacing: 0.5px; }
-.card.flipped .card-name { opacity: 1; }
-
-.card-back {
-position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
-border-radius: 8px; z-index: 2; display: flex; align-items: center; justify-content: center;
-}
-.card.flipped .card-back { display: none; }
-
-.report {
-max-width: 600px; width: 100%; background: #111; border-left: 4px solid var(--gold);
-padding: 25px; margin-top: 30px; line-height: 1.8; white-space: pre-wrap;
-display: none; font-size: 1rem; color: #ccc; border-radius: 0 12px 12px 0;
-}
-.loading { color: var(--gold); display: none; text-align: center; margin-top: 30px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; }
-.loading span { animation: blink 1.4s infinite both; }
-@keyframes blink { 0% { opacity: 0.2; } 20% { opacity: 1; } 100% { opacity: 0.2; } }
-</style>
+        /* Game Styles */
+        .main-container {
+            width: 100%;
+            max-width: 500px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .main-container.visible {
+            display: flex;
+        }
+        .section-label {
+            color: #8a7020;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 600;
+            display: block;
+        }
+        input, textarea, select {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+        }
+        input:focus, textarea:focus {
+            border-color: var(--gold);
+        }
+        textarea {
+            height: 80px;
+            resize: none;
+            margin-top: 5px;
+        }
+        input::placeholder {
+            color: #444;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 15px;
+            align-items: start;
+        }
+        .gender-select {
+            display: flex;
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 2px;
+            border: 1px solid var(--border);
+            height: 52px;
+        }
+        .gender-opt {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        .gender-opt.active {
+            background: var(--gold);
+            color: #000;
+            font-weight: 700;
+        }
+        .qty-select {
+            display: flex;
+            gap: 8px;
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .qty-btn {
+            flex: 1;
+            background: #222;
+            border: 1px solid #333;
+            color: #666;
+            padding: 12px 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.2s;
+            text-align: center;
+        }
+        .qty-btn:hover {
+            border-color: var(--gold);
+            color: var(--text);
+        }
+        .qty-btn.selected {
+            background: var(--gold);
+            color: #000;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        .action-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        button.action-btn {
+            background: #111;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-radius: 10px;
+            transition: 0.3s;
+            flex: 1;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+        button.action-btn:hover:not(:disabled) {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
+        }
+        button.action-btn:disabled {
+            border-color: #333;
+            color: #444;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        button.btn-clear {
+            border-color: #551111;
+            color: #ff4d4d;
+            max-width: 60px;
+            flex: none;
+        }
+        button.btn-clear:hover {
+            background: #551111;
+            color: #fff;
+        }
+        .user-header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+        .user-info span {
+            color: var(--gold);
+            font-weight: bold;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
+        .grid-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: center;
+            margin: 30px auto 0;
+            perspective: 1000px;
+            min-height: 100px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 350px;
+        }
+        .grid.mesa-real {
+            grid-template-columns: repeat(4, 1fr);
+            max-width: 100%;
+            gap: 6px;
+        }
+        .card {
+            width: 100%;
+            aspect-ratio: 2.5/3.5;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.6s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .mesa-real .card {
+            aspect-ratio: 3/4;
+            border-radius: 5px;
+        }
+        .mesa-real .card-inner {
+            font-size: 1.6rem;
+        }
+        .mesa-real .card-name {
+            font-size: 0.45rem;
+        }
+        .card.flipped {
+            border-color: var(--gold);
+            background: #1e1e1e;
+            transform: translateY(-5px);
+        }
+        .card-inner {
+            font-size: 2.4rem;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        .card-name {
+            font-size: 0.75rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.1;
+            opacity: 0;
+            transition: opacity 0.4s;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .card.flipped .card-name {
+            opacity: 1;
+        }
+        .card-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(45deg, #1a1a1a, #1a1a1a 10px, #222 10px, #222 20px);
+            border-radius: 8px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card.flipped .card-back {
+            display: none;
+        }
+        .report {
+            max-width: 600px;
+            width: 100%;
+            background: #111;
+            border-left: 4px solid var(--gold);
+            padding: 25px;
+            margin-top: 30px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            display: none;
+            font-size: 1rem;
+            color: #ccc;
+            border-radius: 0 12px 12px 0;
+        }
+        .loading {
+            color: var(--gold);
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+        .loading span {
+            animation: blink 1.4s infinite both;
+        }
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        .error-msg {
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-<div style="text-align: center; width: 100%;">
-<h1>Lenormand AI</h1>
-<div class="sub">Oráculo Digital</div>
-</div>
+    <!-- AUTH SECTION -->
+    <div id="auth-section" class="auth-container">
+        <h1>Lenormand AI</h1>
+        <div class="sub">Acesso Restrito</div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
+            <button class="auth-tab" onclick="switchTab('register')">Cadastrar</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+            <input type="text" id="login-user" placeholder="Usuário" required>
+            <input type="password" id="login-pass" placeholder="Senha" required>
+            <div id="login-error" class="error-msg">Credenciais inválidas.</div>
+            <button type="submit" class="action-btn" style="margin-top: 10px;">Acessar Oráculo</button>
+        </form>
 
-<div class="main-container" id="input-section">
-<div>
-<label class="section-label">Consultante</label>
-<input type="text" id="consulente-nome" placeholder="Nome completo">
-</div>
+        <!-- Register Form -->
+        <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+            <input type="text" id="reg-user" placeholder="Escolha um Usuário" required pattern="[a-zA-Z0-9_]{3,20}" title="Apenas letras, números e underscore (3-20 chars)">
+            <input type="password" id="reg-pass" placeholder="Crie uma Senha" required minlength="6">
+            <input type="password" id="reg-pass-confirm" placeholder="Confirme a Senha" required>
+            <div id="reg-error" class="error-msg"></div>
+            <button type="submit" class="action-btn" style="margin-top: 10px;">Criar Conta</button>
+        </form>
+    </div>
 
-<div class="info-grid">
-<div>
-<label class="section-label">Data de Nascimento</label>
-<input type="date" id="consulente-nasc">
-</div>
-<div>
-<label class="section-label">Gênero</label>
-<div class="gender-select">
-<button class="gender-opt active" onclick="setGender('Homem')" aria-label="Masculino">Masc</button>
-<button class="gender-opt" onclick="setGender('Mulher')" aria-label="Feminino">Fem</button>
-<button class="gender-opt" onclick="setGender('Outro')" aria-label="Outro">Outro</button>
-</div>
-</div>
-</div>
+    <!-- GAME SECTION (Hidden by default) -->
+    <div id="game-wrapper" style="width: 100%; display: none; flex-direction: column; align-items: center;">
+        <div class="user-header">
+            <div class="user-info">Olá, <span id="display-username">Visitante</span></div>
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
 
-<div>
-<label class="section-label">Tipo de Tiragem</label>
-<div class="qty-select">
-<button class="qty-btn selected" onclick="selectQty(1, this)" aria-label="1 carta">1 Carta</button>
-<button class="qty-btn" onclick="selectQty(3, this)" aria-label="3 cartas">3 Cartas</button>
-<button class="qty-btn" onclick="selectQty(9, this)" aria-label="9 cartas">9 Cartas</button>
-<button class="qty-btn" onclick="selectQty(36, this)" aria-label="Mesa real">Mesa Real</button>
-</div>
-</div>
+        <div class="main-container visible" id="input-section">
+            <div>
+                <label class="section-label">Consultante</label>
+                <input type="text" id="consulente-nome" placeholder="Nome completo">
+            </div>
+            <div class="info-grid">
+                <div>
+                    <label class="section-label">Data de Nascimento</label>
+                    <input type="date" id="consulente-nasc">
+                </div>
+                <div>
+                    <label class="section-label">Gênero</label>
+                    <div class="gender-select">
+                        <button class="gender-opt active" onclick="setGender('Homem')" aria-label="Masculino">Masc</button>
+                        <button class="gender-opt" onclick="setGender('Mulher')" aria-label="Feminino">Fem</button>
+                        <button class="gender-opt" onclick="setGender('Outro')" aria-label="Outro">Outro</button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="section-label">Tipo de Tiragem</label>
+                <div class="qty-select">
+                    <button class="qty-btn selected" onclick="selectQty(1, this)" aria-label="1 carta">1 Carta</button>
+                    <button class="qty-btn" onclick="selectQty(3, this)" aria-label="3 cartas">3 Cartas</button>
+                    <button class="qty-btn" onclick="selectQty(9, this)" aria-label="9 cartas">9 Cartas</button>
+                    <button class="qty-btn" onclick="selectQty(36, this)" aria-label="Mesa real">Mesa Real</button>
+                </div>
+            </div>
+            <div>
+                <label class="section-label">Pergunta (Opcional)</label>
+                <textarea id="question" placeholder="Digite sua pergunta..."></textarea>
+            </div>
+            <div class="action-group">
+                <button class="action-btn" id="btn-deal" onclick="startReading()">🔮 Embaralhar & Abrir</button>
+                <button class="action-btn" id="btn-read" onclick="read()" disabled style="display:none;">✨ Interpretar</button>
+                <button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
+            </div>
+        </div>
 
-<div>
-<label class="section-label">Pergunta (Opcional)</label>
-<textarea id="question" placeholder="Digite sua pergunta..."></textarea>
-</div>
+        <div class="grid-container">
+            <div class="grid" id="table"></div>
+        </div>
 
-<div class="action-group">
-<button class="action-btn" id="btn-deal" onclick="startReading()">🔮 Embaralhar & Abrir</button>
-<button class="action-btn" id="btn-read" onclick="read()" disabled style="display:none;">✨ Interpretar</button>
-<button class="action-btn btn-clear" id="btn-close" onclick="resetGame()" disabled>✖</button>
-</div>
-</div>
+        <div id="loading" class="loading">Consultando as Cartas<span>.</span><span>.</span><span>.</span></div>
+        <div id="report" class="report"></div>
+    </div>
 
-<div class="grid-container">
-<div class="grid" id="table"></div>
-</div>
+    <script>
+        // --- CONFIGURAÇÃO E SEGURANÇA BÁSICA ---
+        // CHAVE API ATUALIZADA
+        const _k = "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";
+        
+        const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        const MODEL = "llama-3.1-8b-instant";
+        const DB_KEY = "lenormand_users_db";
+        const SESSION_KEY = "lenormand_active_session";
 
-<div id="loading" class="loading">Consultando as Cartas<span>.</span><span>.</span><span>.</span></div>
-<div id="report" class="report"></div>
+        // --- ESTADO DO JOGO ---
+        const deck = [
+            { n:1, name: "Cavaleiro", i: "🏇" }, { n:2, name: "Trevo", i: "☘️" }, { n:3, name: "Navio", i: "⛵" },
+            { n:4, name: "Casa", i: "🏠" }, { n:5, name: "Árvore", i: "🌳" }, { n:6, name: "Nuvens", i: "☁️" },
+            { n:7, name: "Cobra", i: "🐍" }, { n:8, name: "Caixão", i: "⚰️" }, { n:9, name: "Buquê", i: "💐" },
+            { n:10, name: "Foice", i: "🌾" }, { n:11, name: "Chicote", i: "🎢" }, { n:12, name: "Pássaros", i: "🐦" },
+            { n:13, name: "Criança", i: "👶" }, { n:14, name: "Raposa", i: "🦊" }, { n:15, name: "Urso", i: "🐻" },
+            { n:16, name: "Estrelas", i: "🌟" }, { n:17, name: "Cegonha", i: "🦢" }, { n:18, name: "Cão", i: "🐕" },
+            { n:19, name: "Torre", i: "🏰" }, { n:20, name: "Jardim", i: "🌳" }, { n:21, name: "Montanha", i: "⛰️" },
+            { n:22, name: "Caminho", i: "🛤️" }, { n:23, name: "Ratos", i: "🐀" }, { n:24, name: "Coração", i: "❤️" },
+            { n:25, name: "Anel", i: "💍" }, { n:26, name: "Livro", i: "📖" }, { n:27, name: "Carta", i: "✉️" },
+            { n:28, name: "Homem", i: "👨" }, { n:29, name: "Mulher", i: "👩" }, { n:30, name: "Lírios", i: "⚜️" },
+            { n:31, name: "Sol", i: "☀️" }, { n:32, name: "Lua", i: "🌙" }, { n:33, name: "Chave", i: "🗝️" },
+            { n:34, name: "Peixes", i: "🐟" }, { n:35, name: "Âncora", i: "⚓" }, { n:36, name: "Cruz", i: "✝️" }
+        ];
 
-<script>
-const KEY = "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";
-const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = "llama-3.1-8b-instant";
+        let state = {
+            gender: 'Homem',
+            targetQty: 1,
+            currentCards: []
+        };
+        let consulenteData = { nome: '', nasc: '' };
+        let currentUser = null;
 
-const deck = [
-{ n:1, name: "Cavaleiro", i: "🏇" }, { n:2, name: "Trevo", i: "☘️" }, { n:3, name: "Navio", i: "⛵" }, { n:4, name: "Casa", i: "🏠" },
-{ n:5, name: "Árvore", i: "🌳" }, { n:6, name: "Nuvens", i: "☁️" }, { n:7, name: "Cobra", i: "🐍" }, { n:8, name: "Caixão", i: "⚰️" },
-{ n:9, name: "Buquê", i: "💐" }, { n:10, name: "Foice", i: "🌾" }, { n:11, name: "Chicote", i: "🎢" }, { n:12, name: "Pássaros", i: "🐦" },
-{ n:13, name: "Criança", i: "👶" }, { n:14, name: "Raposa", i: "🦊" }, { n:15, name: "Urso", i: "🐻" }, { n:16, name: "Estrelas", i: "🌟" },
-{ n:17, name: "Cegonha", i: "🦢" }, { n:18, name: "Cão", i: "🐕" }, { n:19, name: "Torre", i: "🏰" }, { n:20, name: "Jardim", i: "🌳" },
-{ n:21, name: "Montanha", i: "⛰️" }, { n:22, name: "Caminho", i: "🛤️" }, { n:23, name: "Ratos", i: "🐀" }, { n:24, name: "Coração", i: "❤️" },
-{ n:25, name: "Anel", i: "💍" }, { n:26, name: "Livro", i: "📖" }, { n:27, name: "Carta", i: "✉️" }, { n:28, name: "Homem", i: "👨" },
-{ n:29, name: "Mulher", i: "👩" }, { n:30, name: "Lírios", i: "⚜️" }, { n:31, name: "Sol", i: "☀️" }, { n:32, name: "Lua", i: "🌙" },
-{ n:33, name: "Chave", i: "🗝️" }, { n:34, name: "Peixes", i: "🐟" }, { n:35, name: "Âncora", i: "⚓" }, { n:36, name: "Cruz", i: "✝️" }
-];
+        // --- SISTEMA DE AUTENTICAÇÃO (LOCAL STORAGE) ---
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        }
+        function saveUsers(users) {
+            localStorage.setItem(DB_KEY, JSON.stringify(users));
+        }
 
-let state = { gender: 'Homem', targetQty: 1, currentCards: [] };
-let consulenteData = { nome: '', nasc: '' };
+        function switchTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            if (tab === 'login') {
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+                document.getElementById('register-form').classList.add('active');
+            }
+            // Limpa erros
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('reg-error').style.display = 'none';
+        }
 
-function setGender(g) {
-state.gender = g;
-document.querySelectorAll('.gender-opt').forEach(btn => {
-btn.classList.toggle('active', btn.textContent.trim() === (g === 'Homem' ? 'Masc' : g === 'Mulher' ? 'Fem' : 'Outro'));
-});
-}
+        function handleRegister(e) {
+            e.preventDefault();
+            const user = document.getElementById('reg-user').value.trim();
+            const pass = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-pass-confirm').value;
+            const errorDiv = document.getElementById('reg-error');
 
-function selectQty(qty, btn) {
-state.targetQty = qty;
-document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
-btn.classList.add('selected');
-}
+            if (pass !== confirm) {
+                errorDiv.textContent = "As senhas não conferem.";
+                errorDiv.style.display = 'block';
+                return;
+            }
 
-function resetGame() {
-const table = document.getElementById('table');
-table.innerHTML = '';
-table.className = 'grid';
-document.getElementById('report').style.display = 'none';
-document.getElementById('btn-read').disabled = true;
-document.getElementById('btn-read').style.display = 'none';
-document.getElementById('btn-close').disabled = true;
+            const users = getUsers();
+            if (users[user]) {
+                errorDiv.textContent = "Usuário já existe. Tente outro.";
+                errorDiv.style.display = 'block';
+                return;
+            }
 
-const btnDeal = document.getElementById('btn-deal');
-btnDeal.disabled = false;
-btnDeal.textContent = "🔮 Embaralhar & Abrir";
-btnDeal.style.display = 'block';
+            // Salva usuário (Em produção real, jamais salve senha pura. Aqui é simulado)
+            users[user] = { password: pass, history: [] };
+            saveUsers(users);
+            
+            alert("Cadastro realizado com sucesso! Faça login.");
+            switchTab('login');
+            document.getElementById('login-user').value = user;
+            document.getElementById('reg-user').value = "";
+            document.getElementById('reg-pass').value = "";
+            document.getElementById('reg-pass-confirm').value = "";
+        }
 
-document.getElementById('consulente-nome').disabled = false;
-document.getElementById('consulente-nasc').disabled = false;
-document.getElementById('question').disabled = false;
-document.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
-}
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const errorDiv = document.getElementById('login-error');
+            const users = getUsers();
 
-function startReading() {
-const nome = document.getElementById('consulente-nome').value.trim();
-const nasc = document.getElementById('consulente-nasc').value;
+            if (users[user] && users[user].password === pass) {
+                currentUser = user;
+                localStorage.setItem(SESSION_KEY, user);
+                initGameInterface();
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        }
 
-if (!nome) {
-alert("Por favor, digite o nome do consulente.");
-return;
-}
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem(SESSION_KEY);
+            location.reload();
+        }
 
-consulenteData.nome = nome;
-consulenteData.nasc = nasc || "não informada";
+        function checkSession() {
+            const sessionUser = localStorage.getItem(SESSION_KEY);
+            if (sessionUser) {
+                const users = getUsers();
+                if (users[sessionUser]) {
+                    currentUser = sessionUser;
+                    initGameInterface();
+                } else {
+                    localStorage.removeItem(SESSION_KEY);
+                }
+            }
+        }
 
-document.getElementById('consulente-nome').disabled = true;
-document.getElementById('consulente-nasc').disabled = true;
-document.getElementById('question').disabled = true;
-document.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
+        function initGameInterface() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('game-wrapper').style.display = 'flex';
+            document.getElementById('display-username').textContent = currentUser;
+        }
 
-const btnDeal = document.getElementById('btn-deal');
-btnDeal.textContent = "🔮 Embaralhando...";
-btnDeal.disabled = true;
+        // --- LÓGICA DO JOGO (ORIGINAL + AJUSTES) ---
+        function setGender(g) {
+            state.gender = g;
+            document.querySelectorAll('.gender-opt').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.trim() === (g === 'Homem' ? 'Masc' : g === 'Mulher' ? 'Fem' : 'Outro'));
+            });
+        }
 
-const table = document.getElementById('table');
-table.innerHTML = '';
-state.currentCards = [];
+        function selectQty(qty, btn) {
+            state.targetQty = qty;
+            document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
 
-if (state.targetQty === 36) {
-table.classList.add('mesa-real');
-state.currentCards = [...deck].sort(() => Math.random() - 0.5);
-} else {
-table.classList.remove('mesa-real');
-state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, state.targetQty);
-}
+        function resetGame() {
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            table.className = 'grid';
+            document.getElementById('report').style.display = 'none';
+            document.getElementById('btn-read').disabled = true;
+            document.getElementById('btn-read').style.display = 'none';
+            document.getElementById('btn-close').disabled = true;
+            
+            const btnDeal = document.getElementById('btn-deal');
+            btnDeal.disabled = false;
+            btnDeal.textContent = "🔮 Embaralhar & Abrir";
+            btnDeal.style.display = 'block';
+            
+            document.getElementById('consulente-nome').disabled = false;
+            document.getElementById('consulente-nasc').disabled = false;
+            document.getElementById('question').disabled = false;
+            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = false);
+        }
 
-state.currentCards.forEach((c, i) => {
-const cardEl = document.createElement('div');
-cardEl.className = 'card';
-// Verso + conteúdo da carta
-cardEl.innerHTML = `
-<div class="card-back"></div>
-<div class="card-content" style="opacity:0">
-<div class="card-inner">${c.i}</div>
-<div class="card-name">${c.n} ${c.name}</div>
-</div>
-`;
-table.appendChild(cardEl);
+        function startReading() {
+            const nome = document.getElementById('consulente-nome').value.trim();
+            const nasc = document.getElementById('consulente-nasc').value;
+            
+            if (!nome) {
+                alert("Por favor, digite o nome do consulente.");
+                return;
+            }
+            
+            consulenteData.nome = nome;
+            consulenteData.nasc = nasc || "não informada";
+            
+            document.getElementById('consulente-nome').disabled = true;
+            document.getElementById('consulente-nasc').disabled = true;
+            document.getElementById('question').disabled = true;
+            document.querySelectorAll('.qty-btn').forEach(b => b.disabled = true);
+            
+            const btnDeal = document.getElementById('btn-deal');
+            btnDeal.textContent = "🔮 Embaralhando...";
+            btnDeal.disabled = true;
+            
+            const table = document.getElementById('table');
+            table.innerHTML = '';
+            state.currentCards = [];
+            
+            if (state.targetQty === 36) {
+                table.classList.add('mesa-real');
+                state.currentCards = [...deck].sort(() => Math.random() - 0.5);
+            } else {
+                table.classList.remove('mesa-real');
+                state.currentCards = [...deck].sort(() => Math.random() - 0.5).slice(0, state.targetQty);
+            }
 
-// Virar carta com delay sequencial
-setTimeout(() => {
-cardEl.classList.add('flipped');
-cardEl.querySelector('.card-content').style.opacity = '1';
-}, 300 + (i * 120));
-});
+            state.currentCards.forEach((c, i) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                cardEl.innerHTML = `
+                    <div class="card-back"></div>
+                    <div class="card-content" style="opacity:0">
+                        <div class="card-inner">${c.i}</div>
+                        <div class="card-name">${c.n} ${c.name}</div>
+                    </div>
+                `;
+                table.appendChild(cardEl);
+                
+                setTimeout(() => {
+                    cardEl.classList.add('flipped');
+                    cardEl.querySelector('.card-content').style.opacity = '1';
+                }, 300 + (i * 120));
+            });
 
-setTimeout(() => {
-btnDeal.style.display = 'none';
-document.getElementById('btn-read').style.display = 'block';
-document.getElementById('btn-read').disabled = false;
-document.getElementById('btn-close').disabled = false;
-document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
-}, (state.currentCards.length * 120) + 800);
-}
+            setTimeout(() => {
+                btnDeal.style.display = 'none';
+                document.getElementById('btn-read').style.display = 'block';
+                document.getElementById('btn-read').disabled = false;
+                document.getElementById('btn-close').disabled = false;
+                document.getElementById('table').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, (state.currentCards.length * 120) + 800);
+        }
 
-async function read() {
-const q = document.getElementById('question').value;
-const loading = document.getElementById('loading');
-const report = document.getElementById('report');
+        async function read() {
+            const q = document.getElementById('question').value;
+            const loading = document.getElementById('loading');
+            const report = document.getElementById('report');
+            
+            loading.style.display = 'block';
+            report.style.display = 'none';
 
-loading.style.display = 'block';
-report.style.display = 'none';
-loading.scrollIntoView({ behavior: 'smooth' });
+            const cardList = state.currentCards.map(c => `${c.n}. ${c.name} (${c.i})`).join(', ');
+            
+            const prompt = `Atue como um especialista sênior em Baralho Lenormand. 
+            Consultante: ${consulenteData.nome}, Gênero: ${state.gender}, Nascimento: ${consulenteData.nasc}.
+            Pergunta: "${q || 'Leitura geral'}".
+            Cartas tiradas: ${cardList}.
+            
+            Forneça uma interpretação profunda, direta e precisa, conectando as cartas entre si. 
+            Use tom místico mas objetivo. Estruture a resposta em parágrafos claros.`;
 
-try {
-let cardDescription = "";
-if (state.targetQty === 36) {
-let rows = [];
-for (let i = 0; i < 36; i += 4) {
-const rowCards = state.currentCards.slice(i, i + 4).map(c => `${c.name}(${c.n})`).join(", ");
-rows.push(`Linha ${Math.floor(i/4)+1}: [${rowCards}]`);
-}
-cardDescription = rows.join("\n");
-} else {
-cardDescription = state.currentCards.map((c, idx) => `${idx+1}. ${c.name} (${c.n})`).join(", ");
-}
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${_k}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [{ role: "user", content: prompt }],
+                        temperature: 0.7,
+                        max_tokens: 1024
+                    })
+                });
 
-const res = await fetch(API_URL, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json',
-'Authorization': `Bearer ${KEY}`
-},
-body: JSON.stringify({
-model: MODEL,
-messages: [{
-role: "user",
-content: `Mestre Lenormand. Interpretar para ${consulenteData.nome} (${state.gender}, nascido em ${consulenteData.nasc}). Pergunta: "${q || 'Questão geral'}". Cartas sorteadas: ${cardDescription}. Dê uma interpretação profunda e direta. Max 20 linhas.`
-}],
-temperature: 0.7
-})
-});
+                if (!response.ok) throw new Error('Falha na conexão com o Oráculo');
 
-const data = await res.json();
-const text = data.choices?.[0]?.message?.content || "Erro na resposta da API.";
-loading.style.display = 'none';
-report.textContent = text;
-report.style.display = 'block';
-report.scrollIntoView({ behavior: 'smooth' });
+                const data = await response.json();
+                const text = data.choices[0].message.content;
+                
+                report.textContent = text;
+                report.style.display = 'block';
+                loading.style.display = 'none';
+                
+                // Salva no histórico do usuário (simulado)
+                const users = getUsers();
+                if (users[currentUser]) {
+                    if (!users[currentUser].history) users[currentUser].history = [];
+                    users[currentUser].history.push({ date: new Date().toISOString(), question: q, result: text });
+                    saveUsers(users);
+                }
 
-} catch (e) {
-loading.style.display = 'none';
-document.getElementById('report').textContent = "Erro ao conectar à API Groq.";
-document.getElementById('report').style.display = 'block';
-console.error("Erro na API:", e);
-}
-}
-</script>
+            } catch (err) {
+                loading.style.display = 'none';
+                alert("Erro: " + err.message);
+            }
+        }
+
+        // Inicializa verificação de sessão ao carregar
+        window.onload = checkSession;
+    </script>
 </body>
 </html>
